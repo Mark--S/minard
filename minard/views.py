@@ -7,13 +7,17 @@ import time
 from redis import Redis
 from os.path import join
 import json
-from tools import total_seconds, parseiso
+from tools import total_seconds, parseiso, import_DQ_ratdb
 import requests
 from collections import deque, namedtuple
 from timeseries import get_timeseries, get_interval, get_hash_timeseries
 from timeseries import get_timeseries_field, get_hash_interval
 import numpy as np
 from math import isnan
+import os
+import sys
+
+import random
 
 import pcadb
 import ecadb
@@ -561,5 +565,22 @@ def pca_run_detail(run_number):
     
     return render_template('pca_run_detail.html',
                             run_number=run_number)      
-   
+  
+@app.route('/calibdq')
+def calibdq():
+    return render_template('calibdq.html')
+
+@app.route('/calibdq_smellie')
+def calibdq_smellie():
+    run_numbers = []
+    run_info = []
+    root_dir = "/home/mark/Documents/PHD/DQTests/SMELLEIDQTest/"
+    ratOutputs = os.listdir(root_dir)
+    for files in ratOutputs:
+        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files:
+           run_num, check_params =  import_DQ_ratdb(os.path.join(root_dir,files))
+           if "DQSmellieProc" in check_params:
+               run_numbers.append(run_num)
+               run_info.append(check_params["DQSmellieProc"])
+    return render_template('calibdq_smellie.html',run_numbers=run_numbers,run_info=run_info)
 
