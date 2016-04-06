@@ -8,11 +8,9 @@ from redis import Redis
 from os.path import join
 import json
 from tools import total_seconds, parseiso
-import requests
 from collections import deque, namedtuple
 from timeseries import get_timeseries, get_interval, get_hash_timeseries
 from timeseries import get_timeseries_field, get_hash_interval
-import numpy as np
 from math import isnan
 
 import pcadb
@@ -88,6 +86,45 @@ def timefmt(timestamp):
 def status():
     return render_template('status.html', programs=PROGRAMS)
 
+@app.route('/state')
+@app.route('/state/<int:run>')
+def state(run=None):
+    import detector_state
+
+    if run is None:
+	run = detector_state.get_latest_run()
+
+    try:
+        run_state = detector_state.get_run_state(run)
+    except Exception as err:
+        return render_template('state.html',err = str(err))
+        
+    detector_control_state = None
+    if run_state['detector_control'] is not None:
+        detector_control_state = detector_state.get_detector_control_state(run_state['detector_control'])
+
+    mtc_state = None
+    if run_state['mtc'] is not None:
+        mtc_state = detector_state.get_mtc_state(run_state['mtc'])
+
+    caen_state = None
+    if run_state['caen'] is not None:
+        caen_state = detector_state.get_caen_state(run_state['caen'])
+
+    crates_state =[None]*20
+    for iCrate in range(20):
+        if run_state['crate'+str(iCrate)] is not None:
+            crates_state[iCrate] = detector_state.get_crate_state(run_state['crate'+str(iCrate)])
+
+        
+    return render_template('state.html',run=run,
+					run_state = run_state,
+                                        detector_control_state = detector_control_state,
+                                        mtc_state = mtc_state,
+                                        caen_state = caen_state,
+                                        crates_state = crates_state,
+                                        err = None)
+
 @app.route('/l2')
 def l2():
     step = request.args.get('step',3,type=int)
@@ -151,6 +188,8 @@ def view_log():
 @app.route('/log', methods=['POST'])
 def log():
     """Forward a POST request to the log server at port 8081."""
+    import requests
+
     resp = requests.post('http://127.0.0.1:8081', headers=request.headers, data=request.form)
     return resp.content, resp.status_code, resp.headers.items()
 
@@ -203,15 +242,6 @@ def tail():
 @app.route('/')
 def index():
     return redirect(url_for('snostream'))
-
-@app.route('/supervisor')
-@app.route('/supervisor/<path:path>')
-def supervisor(path=None):
-    if path is None:
-        return redirect(url_for('supervisor', path='index.html'))
-
-    resp = requests.get('http://127.0.0.1:9001' + request.full_path[11:])
-    return resp.content, resp.status_code, resp.headers.items()
 
 @app.route('/docs/')
 @app.route('/docs/<filename>')
@@ -344,6 +374,8 @@ def get_alarm():
 @app.route('/owl_tubes')
 def owl_tubes():
     """Returns the time series for the sum of all upward facing OWL tubes."""
+    import numpy as np
+
     name = request.args['name']
     start = request.args.get('start', type=parseiso)
     stop = request.args.get('stop', type=parseiso)
