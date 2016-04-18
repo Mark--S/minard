@@ -11,3 +11,5 @@ var url_params;
         while (match = search.exec(query))
             url_params[decode(match[1])] = decode(match[2]);
 })();
+
+

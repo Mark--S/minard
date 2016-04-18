@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %}SMELLIE Data Quality for run {{run_number}} subrun {{subrun_number}}{% endblock %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+{% block body %}
+{{ super() }}
+<div class="container">
+    <h1>SMELLIE Data Quality Plots for run {{run_number}} subrun {{subrun_number}}</h1>
+    {% for i in range(plots|length) %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{titles[i]}}</h3>
+        </div>
+        <div class="panel-body">
+            <img src="{{plots[i]}}" class="img-responsive center-block">
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -7,11 +7,16 @@ import time
 from redis import Redis
 from os.path import join
 import json
-from tools import total_seconds, parseiso
+from tools import total_seconds, parseiso, import_SMELLIEDQ_ratdb
+import requests
 from collections import deque, namedtuple
 from timeseries import get_timeseries, get_interval, get_hash_timeseries
 from timeseries import get_timeseries_field, get_hash_interval
 from math import isnan
+import os
+import sys
+
+import random
 
 import pcadb
 import ecadb
@@ -612,3 +617,62 @@ def calibdq_tellie():
                 run_info.append(check_params["dqtellieproc"])
     print(run_numbers)
     return render_template('calibdq_tellie.html',run_numbers=run_numbers,run_info=run_info)
+
+@app.route('/calibdq_smellie')
+def calibdq_smellie():
+    run_numbers = []
+    run_info = []
+    root_dir = "/home/mark/Documents/PHD/DQTests/SMELLEIDQTest/"
+    ratOutputs = os.listdir(root_dir)
+    for files in ratOutputs:
+        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files:
+           print(files)
+           run_num, check_params, subRunCheck=  import_SMELLIEDQ_ratdb(os.path.join(root_dir,files))
+           if "DQSmellieProc" in check_params:
+               run_numbers.append(run_num)
+               run_info.append(check_params["DQSmellieProc"])
+               print(run_numbers)
+    return render_template('calibdq_smellie.html',run_numbers=run_numbers,run_info=run_info)
+
+@app.route('/calibdq_smellie/<run_number>')
+def calibdq_smellie_run_number(run_number):
+    run_num = 0
+    run_info = []
+    subRunChecks = 0
+    root_dir = "/home/mark/Documents/PHD/DQTests/SMELLEIDQTest/"
+    ratOutputs = os.listdir(root_dir)
+    for files in ratOutputs:
+        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files:
+           run_num, check_params, subRunCheck=  import_SMELLIEDQ_ratdb(os.path.join(root_dir,files))
+           if run_num == int(run_number):
+               if "DQSmellieProc" in check_params:
+                   subRunChecks = subRunCheck
+    
+    return render_template('calibdq_smellie_run.html',run_number=run_number,subRunChecks=subRunChecks)
+
+
+@app.route('/calibdq_smellie/<run_number>/<subrun_number>')
+def calibdq_smellie_subrun_number(run_number,subrun_number):
+    run_num = 0
+    plots = []
+    subRunChecks = 0
+    root_dir = os.path.join(app.static_folder,"images/SMELLIEDQPlots_"+str(run_number),"subrun_"+str(subrun_number))
+    images = os.listdir(root_dir)
+    #Sort the entire array by check number
+    images.sort(key= lambda x : int(x[x.find("Check")+5]))
+    #Sort the images for check 1
+    images[:3] = sorted(images[:3])
+    #Swap two elements to make the trigger cut plots together
+    images[2], images[3]  =  images[3], images[2]
+    #Sort the images for check 3
+    images[5:6] = sorted(images[5:6])
+    #Sort the images for check 3
+    images[7:] = sorted(images[7:])
+    print(images)
+    #Array to store the titles of the plots
+    titleArray = ["Hit Maps for all Events","Hit Maps for events passing the trigger cut","Hit Maps for events failing the trigger cut","NHits Plots for all trigger types","NHits vs Trigger Type","NHits vs time between events","Time between events passing the trigger cut","First Peak Hit Map","Second Peak Hit Map"]
+    for image in images:
+        img_url = url_for("static",filename=os.path.join("images/SMELLIEDQPlots_"+str(run_number)+"/subrun_"+str(subrun_number),image))
+        print(img_url)
+        plots.append(img_url)
+    return render_template('calibdq_smellie_subrun.html',run_number=run_number,subrun_number=subrun_number,plots=plots, titles=titleArray)
