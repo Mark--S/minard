@@ -7,7 +7,7 @@ import time
 from redis import Redis
 from os.path import join
 import json
-from tools import total_seconds, parseiso, import_SMELLIEDQ_ratdb
+from tools import total_seconds, parseiso, import_SMELLIEDQ_ratdb, import_TELLIEDQ_ratdb
 import requests
 from collections import deque, namedtuple
 from timeseries import get_timeseries, get_interval, get_hash_timeseries
@@ -616,7 +616,27 @@ def calibdq_tellie():
                 run_numbers.append(run_num)
                 run_info.append(check_params["dqtellieproc"])
     print(run_numbers)
+    print(run_info)
     return render_template('calibdq_tellie.html',run_numbers=run_numbers,run_info=run_info)
+
+@app.route('/calibdq_tellie/<run_number>/')
+def calibdq_tellie_run_number(run_number):
+    run_num = 0
+    plots = []
+    subRunChecks = 0
+    root_dir = os.path.join(app.static_folder,"images/SMELLIEDQPlots_"+str(run_number),"subrun_")
+    images = os.listdir(root_dir)
+    print(images)
+    #Array to store the titles of the plots
+    titleArray = ["Hit Maps for all Events","Hit Maps for events passing the trigger cut","Hit Maps for events failing the trigger cut","NHits Plots for all trigger types","NHits vs Trigger Type","NHits vs time between events","Time between events passing the trigger cut","First Peak Hit Map","Second Peak Hit Map"]
+    for image in images:
+        img_url = url_for("static",filename=os.path.join("images/SMELLIEDQPlots_"+str(run_number)+"/subrun_"+str(subrun_number),image))
+        print(img_url)
+        plots.append(img_url)
+    return render_template('calibdq_tellie_subrun.html',run_number=run_number,subrun_number=subrun_number,plots=plots, titles=titleArray)
+
+
+
 
 @app.route('/calibdq_smellie')
 def calibdq_smellie():
