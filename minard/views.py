@@ -593,5 +593,22 @@ def pca_run_detail(run_number):
     
     return render_template('pca_run_detail.html',
                             run_number=run_number)      
+@app.route('/calibdq')
+def calibdq():
+        return render_template('calibdq.html')
    
-
+@app.route('/calibdq_tellie')
+def calibdq_tellie():
+    run_numbers = []
+    run_info = []
+    root_dir = "/home/mark/Documents/PHD/DQTests/TELLIEDQTest/inrootProcessedfiles/"
+    ratOutputs = os.listdir(root_dir)
+    for files in ratOutputs:
+        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and "p2" in files:
+            print(files)
+            run_num, check_params =  import_TELLIEDQ_ratdb(os.path.join(root_dir,files))
+            if "dqtellieproc" in check_params:
+                run_numbers.append(run_num)
+                run_info.append(check_params["dqtellieproc"])
+    print(run_numbers)
+    return render_template('calibdq_tellie.html',run_numbers=run_numbers,run_info=run_info)
