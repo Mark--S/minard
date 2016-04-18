@@ -641,11 +641,11 @@ def calibdq_smellie_subrun_number(run_number,subrun_number):
     run_num = 0
     plots = []
     subRunChecks = 0
-    root_dir = os.path.join(app.static_folder,"/images/SMELLIEDQPlots_"+str(run_number),"/subrun_"+str(subrun_number))
+    root_dir = os.path.join(app.static_folder,"images/SMELLIEDQPlots_"+str(run_number),"subrun_"+str(subrun_number))
     images = os.listdir(root_dir)
     print(images)
     for image in images:
-        img_url = url_for("static",filename=os.path.join("/images/SMELLIEDQPlots_"+str(run_number)+"/subrun_"+str(subrun_number),image))
+        img_url = url_for("static",filename=os.path.join("images/SMELLIEDQPlots_"+str(run_number)+"/subrun_"+str(subrun_number),image))
         print(img_url)
         plots.append(img_url)
     return render_template('calibdq_smellie_subrun.html',run_number=run_number,subrun_number=subrun_number,plots=plots)
