@@ -20,5 +20,7 @@ setup(name='minard',
                         'argparse',
                         'sphinx',
                         'requests',
+                        'sqlalchemy',
+                        'psycopg2',
                         'alabaster']
       )

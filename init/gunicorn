@@ -8,6 +8,9 @@ PIDFILE=/var/run/gunicorn.pid
 LOGFILE=/var/log/gunicorn.log
 APP=minard:app
 USER=gunicorn
+MINARD_SETTINGS=/etc/minard/settings.cfg
+
+export MINARD_SETTINGS
 
 case "$1" in
     start)

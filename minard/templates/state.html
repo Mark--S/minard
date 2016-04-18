@@ -1,0 +1,167 @@
+{% extends "layout.html" %}
+{% block title %}State{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block body %}
+    {{ super() }}
+    <div class="container">
+        {% if err %}
+            Error talking to the DB : {{ err }}
+        {% else %}
+	    <center><h1> Run {{ run }} </h1></center>
+            {% if mtc_state %}
+                mtc_stuff </br>
+                <div id="mtc"></div>
+                    <ul>
+                    {% for key,val in mtc_state.iteritems() %}
+                        <li>{{ key}} = {{val}}</li>
+                    {% endfor %}
+                    </ul>
+            {% endif %}
+            {% if caen_state %}
+                caen stuff</br>
+                    <ul>
+                    {% for key,val in caen_state.iteritems() %}
+                        <li>{{ key}} = {{val}}</li>
+                    {% endfor %}
+                    </ul>
+            {% endif %}
+            {% if detector_control_state %}
+                    detector controll stuff </br>
+                    <ul>
+                    {% for key,val in detector_control_state.iteritems() %}
+                        <li>{{ key}} = {{val}}</li>
+                    {% endfor %}
+                    </ul>
+            {% endif %}
+            {% for i in range(20) %}
+                 {% if crates_state[i] %}
+                    display crate {{i}} stuff
+                {% endif %}
+            {% endfor %}
+            {% if run_state %}
+                run stuff</br>
+                <ul>
+                {% for key,val in run_state.iteritems() %}
+                    <li>{{ key }} = {{val }} </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock %}
+{% block script %}
+    <script src="{{ url_for('static', filename='js/d3.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/colorbrewer.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/crate.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/histogram.js') }}"></script>
+    <script type="text/javascript">
+        var mtc_data = {{mtc_state |tojson |safe }};
+
+        function display_triggers(maskVal) {
+            var wordlist=[];
+            var bit_to_string ={
+                                0 :"NHIT100LO",
+                                1 :"NHIT100MED",
+                                2 :"NHIT100HI",
+                                3 :"NHIT20",
+                                4 :"NHIT20LB",
+                                5 :"ESUMLO",
+                                6 :"ESUMHI",
+                                7 :"OWLN",
+                                8 :"OWLELO",
+                                9 :"OWLEHI",
+                                10:"PULSE_GT",
+                                11:"PRESCALE",
+                                12:"PEDESTAL",
+                                13:"PONG",
+                                14:"SYNC",
+                                15:"EXT_ASYNC",
+                                16:"EXT2",
+                                17:"EXT3",
+                                18:"EXT4",
+                                19:"EXT5",
+                                20:"EXT6",
+                                21:"EXT7",
+                                22:"EXT8_PULSE_ASYNC",
+                                23:"SPECIAL_RAW",
+                                24:"NCD",
+                                25:"SOFT_GT"
+                                };
+            for(i=25;i>=0;i--) {
+                if( (maskVal & 1<<i) >0){
+                    wordlist.push(bit_to_string[i]);
+                }
+            }
+            var mtc = d3.select('#mtc');
+            mtc.append("h3").text("Enabled Triggers");
+            var trig_list = d3.select('#mtc').append('ul');
+            trig_list.selectAll('li')
+                     .data(wordlist)
+                     .enter()
+                     .append('li')
+                     .text(function(d){ return d;});
+        };
+
+        function display_ped_delay(coarseDelay_mask,fineDelay_mask) {
+            MIN_GT_DELAY = 18.35; //Taken from daq/src/mtc.c
+            AddelSlope = 0.1; //Taken from daq/src/mtc.c
+            var coarseDelay = ((~coarseDelay_mask)>>>0)*10;
+            var fine_delay = (fineDelay_mask & 0xFF) * AddelSlope;
+            var delay = coarseDelay + fine_delay;
+            var mtc = d3.select('#mtc')
+            mtc.append("h3").text("Pedestal Delay = "+ delay.toString());
+
+        };
+        function display_lockout_width(lockoutMask) {
+            var lockout = (~lockoutMask) & 0xFF;
+            lockout*=20
+            var mtc = d3.select('#mtc')
+            mtc.append("h3").text("Lockout Width = "+ lockout.toString());
+        };
+        function display_control_reg(control_reg) {
+            var mtc = d3.select('#mtc');
+            var wordlist = [];
+            bit_to_string = {
+             0: "PED_EN",
+             1: "PULSE_EN",
+             2: "LOAD_ENPR",
+             3: "LOAD_ENPS",
+             4: "LOAD_ENPW",
+             5: "LOAD_ENLK",
+             6: "ASYNC_EN",
+             7: "RESYNC_EN",
+             8: "TESTGT",
+             9: "TEST50",
+             10: "kTEST10",
+             11: "kLOAD_ENGT",
+             12: "kLOAD_EN50",
+             13: "kLOAD_EN10",
+             14: "kTESTMEM1",
+             15: "kTESTMEM2",
+             16: "FIFO_RESET"
+            }
+            for(i=16;i>=0;i--) {
+                if( (control_reg & 1<<i) >0){
+                    wordlist.push(bit_to_string[i]);
+                }
+            }
+            console.log(wordlist);
+            mtc.append('h3').text("Control Register Values");
+            var trig_list = mtc.append('ul');
+            trig_list.selectAll('li')
+                     .data(wordlist)
+                     .enter()
+                     .append('li')
+                     .text(function(d){ return d;});
+        };
+        display_triggers(mtc_data.gt_mask);
+        display_ped_delay(mtc_data.coarse_delay,mtc_data.fine_delay);
+        display_lockout_width(mtc_data.lockout_width)
+        display_control_reg(mtc_data.control_register);
+       </script>
+
+    <script>
+    </script>
+{% endblock %}
