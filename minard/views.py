@@ -643,9 +643,21 @@ def calibdq_smellie_subrun_number(run_number,subrun_number):
     subRunChecks = 0
     root_dir = os.path.join(app.static_folder,"images/SMELLIEDQPlots_"+str(run_number),"subrun_"+str(subrun_number))
     images = os.listdir(root_dir)
+    #Sort the entire array by check number
+    images.sort(key= lambda x : int(x[x.find("Check")+5]))
+    #Sort the images for check 1
+    images[:3] = sorted(images[:3])
+    #Swap two elements to make the trigger cut plots together
+    images[2], images[3]  =  images[3], images[2]
+    #Sort the images for check 3
+    images[5:6] = sorted(images[5:6])
+    #Sort the images for check 3
+    images[7:] = sorted(images[7:])
     print(images)
+    #Array to store the titles of the plots
+    titleArray = ["Hit Maps for all Events","Hit Maps for events passing the trigger cut","Hit Maps for events failing the trigger cut","NHits Plots for all trigger types","NHits vs Trigger Type","NHits vs time between events","Time between events passing the trigger cut","First Peak Hit Map","Second Peak Hit Map"]
     for image in images:
         img_url = url_for("static",filename=os.path.join("images/SMELLIEDQPlots_"+str(run_number)+"/subrun_"+str(subrun_number),image))
         print(img_url)
         plots.append(img_url)
-    return render_template('calibdq_smellie_subrun.html',run_number=run_number,subrun_number=subrun_number,plots=plots)
+    return render_template('calibdq_smellie_subrun.html',run_number=run_number,subrun_number=subrun_number,plots=plots, titles=titleArray)
