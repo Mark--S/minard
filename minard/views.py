@@ -7,7 +7,7 @@ import time
 from redis import Redis
 from os.path import join
 import json
-from tools import total_seconds, parseiso, import_DQ_ratdb
+from tools import total_seconds, parseiso, import_SMELLIEDQ_ratdb
 import requests
 from collections import deque, namedtuple
 from timeseries import get_timeseries, get_interval, get_hash_timeseries
@@ -578,8 +578,41 @@ def calibdq_smellie():
     ratOutputs = os.listdir(root_dir)
     for files in ratOutputs:
         if "DATAQUALITY_RECORDS" in files and ".ratdb" in files:
-           run_num, check_params =  import_DQ_ratdb(os.path.join(root_dir,files))
+           print(files)
+           run_num, check_params, subRunCheck=  import_SMELLIEDQ_ratdb(os.path.join(root_dir,files))
            if "DQSmellieProc" in check_params:
                run_numbers.append(run_num)
                run_info.append(check_params["DQSmellieProc"])
+               print(run_numbers)
     return render_template('calibdq_smellie.html',run_numbers=run_numbers,run_info=run_info)
+
+@app.route('/calibdq_smellie/<run_number>')
+def calibdq_smellie_run_number(run_number):
+    run_num = 0
+    run_info = []
+    subRunChecks = 0
+    root_dir = "/home/mark/Documents/PHD/DQTests/SMELLEIDQTest/"
+    ratOutputs = os.listdir(root_dir)
+    for files in ratOutputs:
+        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files:
+           run_num, check_params, subRunCheck=  import_SMELLIEDQ_ratdb(os.path.join(root_dir,files))
+           if run_num == int(run_number):
+               if "DQSmellieProc" in check_params:
+                   subRunChecks = subRunCheck
+    
+    return render_template('calibdq_smellie_run.html',run_number=run_number,subRunChecks=subRunChecks)
+
+
+@app.route('/calibdq_smellie/<run_number>/<subrun_number>')
+def calibdq_smellie_subrun_number(run_number,subrun_number):
+    run_num = 0
+    plots = []
+    subRunChecks = 0
+    root_dir = os.path.join(app.static_folder,"/images/SMELLIEDQPlots_"+str(run_number),"/subrun_"+str(subrun_number))
+    images = os.listdir(root_dir)
+    print(images)
+    for image in images:
+        img_url = url_for("static",filename=os.path.join("/images/SMELLIEDQPlots_"+str(run_number)+"/subrun_"+str(subrun_number),image))
+        print(img_url)
+        plots.append(img_url)
+    return render_template('calibdq_smellie_subrun.html',run_number=run_number,subrun_number=subrun_number,plots=plots)

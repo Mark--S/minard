@@ -1,6 +1,8 @@
+from __future__ import print_function
 from datetime import datetime
 import calendar
 import json
+import sys
 
 def total_seconds(td):
     """Returns the total number of seconds contained in the duration."""
@@ -11,8 +13,15 @@ def parseiso(timestr):
     dt = datetime.strptime(timestr,'%Y-%m-%dT%H:%M:%S.%fZ')
     return calendar.timegm(dt.timetuple()) + dt.microsecond/1e6
 
-def import_DQ_ratdb(ratdbFile):
+def import_SMELLIEDQ_ratdb(ratdbFile):
     runNumber = int(ratdbFile[-13:-9])
     json_data = open(ratdbFile).read()
     data = json.loads(json_data)
-    return runNumber, data["checks"]
+    subRunChecks = []
+    subRunChecks.append(data["smellieFibreCheckSubrun"])
+    subRunChecks.append(data["smellieNumberOfEventsSubrun"])
+    subRunChecks.append(data["smelliePeakRatioSubrun"])
+    subRunChecks.append(data["smellieFrequencyCheckSubrun"])
+    subRunChecks.append( data["smellieNPeaksSubrun"])
+    subRunChecks.append(data["smellieIntensityCheckSubrun"])
+    return runNumber, data["checks"], subRunChecks 

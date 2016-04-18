@@ -23,42 +23,43 @@
             <tbody>
                 {% for i in range(run_numbers|length) %}
                 <tr>
-                <td>{{run_numbers[i]}}</td>
-                
-                {% if run_info[i]["smellieCorrectFibre"] == 1 %} 
-                <td>Pass</td>
-                {% else %}
-                <td><font color="red">Fail</font></td>
-                {% endif %}
-                
-                {% if run_info[i]["smellieNumberOfEventsCheck"] == 1 %} 
-                <td>Pass</td>
-                {% else %}
-                <td><font color="red">Fail</font></td>
-                {% endif %}
-                {% if run_info[i]["smelliePeakRatio"] == 1 %} 
-                <td>Pass</td>
-                {% else %}
-                <td><font color="red">Fail</font></td>
-                {% endif %}
-                
-                {% if run_info[i]["smellieFrequencyCheck"] == 1 %} 
-                <td>Pass</td>
-                {% else %}
-                <td><font color="red">Fail</font></td>
-                {% endif %}
-                
-                {% if run_info[i]["smellieNPeaks"] == 1 %} 
-                <td>Pass</td>
-                {% else %}
-                <td><font color="red">Fail</font></td>
-                {% endif %}
-                
-                {% if run_info[i]["smellieIntensityCheck"] == 1 %} 
-                <td>Pass</td>
-                {% else %}
-                <td><font color="red">Fail</font></td>
-                {% endif %}
+                    <td><a href="{{ url_for('calibdq_smellie_run_number',run_number=run_numbers[i])}}">{{run_numbers[i]}}</a></td>
+
+                    {% if run_info[i]["smellieCorrectFibre"] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
+
+                    {% if run_info[i]["smellieNumberOfEventsCheck"] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
+                    
+                    {% if run_info[i]["smelliePeakRatio"] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
+
+                    {% if run_info[i]["smellieFrequencyCheck"] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
+
+                    {% if run_info[i]["smellieNPeaks"] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
+
+                    {% if run_info[i]["smellieIntensityCheck"] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
                 </tr> 
                 {% endfor %}
             </tbody>
