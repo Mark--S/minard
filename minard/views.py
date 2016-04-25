@@ -606,12 +606,12 @@ def calibdq():
 def calibdq_tellie():
     run_numbers = []
     run_info = []
-    root_dir = "/home/mark/Documents/PHD/DQTests/TELLIEDQTest/inrootProcessedfiles/"
+    root_dir = "/home/mark/Documents/PHD/DQTests/TELLIEDQTest/"
     ratOutputs = os.listdir(root_dir)
     for files in ratOutputs:
         if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and "p2" in files:
             print(files)
-            run_num, check_params =  import_TELLIEDQ_ratdb(os.path.join(root_dir,files))
+            run_num, check_params, runInformation =  import_TELLIEDQ_ratdb(os.path.join(root_dir,files))
             if "dqtellieproc" in check_params:
                 run_numbers.append(run_num)
                 run_info.append(check_params["dqtellieproc"])
@@ -623,17 +623,24 @@ def calibdq_tellie():
 def calibdq_tellie_run_number(run_number):
     run_num = 0
     plots = []
+    runInformation = {}
     subRunChecks = 0
-    root_dir = os.path.join(app.static_folder,"images/SMELLIEDQPlots_"+str(run_number),"subrun_")
+    root_dir = os.path.join(app.static_folder,"images/TELLIEDQPlots_"+str(run_number))
+    root_tellie_dir = "/home/mark/Documents/PHD/DQTests/TELLIEDQTest/"
+    ratOutputs = os.listdir(root_tellie_dir)
+    for files in ratOutputs:
+        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and "p2" and run_number in files:
+            print(files)
+            run_num, check_params, runInformation =  import_TELLIEDQ_ratdb(os.path.join(root_tellie_dir,files))
+    
     images = os.listdir(root_dir)
     print(images)
     #Array to store the titles of the plots
-    titleArray = ["Hit Maps for all Events","Hit Maps for events passing the trigger cut","Hit Maps for events failing the trigger cut","NHits Plots for all trigger types","NHits vs Trigger Type","NHits vs time between events","Time between events passing the trigger cut","First Peak Hit Map","Second Peak Hit Map"]
+    titleArray = ["Hit Map","Calibrated Hit Time Plot","TAC Plot"]
     for image in images:
-        img_url = url_for("static",filename=os.path.join("images/SMELLIEDQPlots_"+str(run_number)+"/subrun_"+str(subrun_number),image))
-        print(img_url)
+        img_url = url_for("static",filename=os.path.join("images/TELLIEDQPlots_"+str(run_number),image))
         plots.append(img_url)
-    return render_template('calibdq_tellie_subrun.html',run_number=run_number,subrun_number=subrun_number,plots=plots, titles=titleArray)
+    return render_template('calibdq_tellie_run.html',run_number=run_number,plots=plots, titles=titleArray, runInformation=runInformation)
 
 
 
