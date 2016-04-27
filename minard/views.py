@@ -670,7 +670,7 @@ def calibdq_smellie_run_number(run_number):
     ratOutputs = os.listdir(root_dir)
     for files in ratOutputs:
         if "DATAQUALITY_RECORDS" in files and ".ratdb" in files:
-           run_num, check_params, subRunCheck=  import_SMELLIEDQ_ratdb(os.path.join(root_dir,files))
+           run_num, check_params, subRunCheck, runInformation =  import_SMELLIEDQ_ratdb(os.path.join(root_dir,files))
            if run_num == int(run_number):
                if "DQSmellieProc" in check_params:
                    subRunChecks = subRunCheck
@@ -680,6 +680,15 @@ def calibdq_smellie_run_number(run_number):
 
 @app.route('/calibdq_smellie/<run_number>/<subrun_number>')
 def calibdq_smellie_subrun_number(run_number,subrun_number):
+    rinInfo = {}
+    root_dir = "/home/mark/Documents/PHD/DQTests/SMELLEIDQTest/"
+    ratOutputs = os.listdir(root_dir)
+    for files in ratOutputs:
+        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files:
+           run_num, check_params, subRunCheck, runInformation =  import_SMELLIEDQ_ratdb(os.path.join(root_dir,files))
+           if run_num == int(run_number):
+               if "DQSmellieProc" in check_params:
+                   runInfo = runInformation
     run_num = 0
     plots = []
     subRunChecks = 0
@@ -702,4 +711,4 @@ def calibdq_smellie_subrun_number(run_number,subrun_number):
         img_url = url_for("static",filename=os.path.join("images/SMELLIEDQPlots_"+str(run_number)+"/subrun_"+str(subrun_number),image))
         print(img_url)
         plots.append(img_url)
-    return render_template('calibdq_smellie_subrun.html',run_number=run_number,subrun_number=subrun_number,plots=plots, titles=titleArray)
+    return render_template('calibdq_smellie_subrun.html',run_number=run_number,subrun_number=subrun_number,plots=plots, titles=titleArray, runInformation = runInfo) 

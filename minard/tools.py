@@ -40,6 +40,7 @@ def import_SMELLIEDQ_ratdb(ratdbFile):
     runNumber = int(ratdbFile[-13:-9])
     json_data = open(ratdbFile).read()
     data = json.loads(json_data)
+    runInformation =  {}
     subRunChecks = []
     subRunChecks.append(data["smellieFibreCheckSubrun"])
     subRunChecks.append(data["smellieNumberOfEventsSubrun"])
@@ -47,4 +48,19 @@ def import_SMELLIEDQ_ratdb(ratdbFile):
     subRunChecks.append(data["smellieFrequencyCheckSubrun"])
     subRunChecks.append( data["smellieNPeaksSubrun"])
     subRunChecks.append(data["smellieIntensityCheckSubrun"])
-    return runNumber, data["checks"], subRunChecks 
+    runInformation["events_failing_nhit_failing_trigger"] = data["events_failing_nhit_failing_trigger"] 
+    runInformation["events_failing_nhit_passing_trigger"] = data["events_failing_nhit_passing_trigger"]
+    runInformation["events_passing_nhit_and_trigger"] = data["events_passing_nhit_and_trigger"]
+    runInformation["events_passing_nhit_failing_trigger"] = data["events_passing_nhit_failing_trigger"]
+    runInformation["fibre_calculated_subrun"] = data["fibre_calculated_subrun"]
+    runInformation["fibre_expected_subrun"] = data["fibre_expected_subrun"]
+    runInformation["frequency_actual_subrun"] = data["frequency_actual_subrun"]
+    runInformation["frequency_expected_subrun"] = data["frequency_expected_subrun"]
+    runInformation["mean_nhit_smellie_trigger_subrun"] = data["mean_nhit_smellie_trigger_subrun"]
+    runInformation["nhit_event_next_to_trigger_event"] = data["nhit_event_next_to_trigger_event"]
+    runInformation["nhit_event_no_adjacent_trigger"] = data["nhit_event_no_adjacent_trigger"]
+    runInformation["number_events_expected_subrun"] = data["number_events_expected_subrun"]
+    runInformation["number_events_seen_subrun"] = data["number_events_seen_subrun"]
+    runInformation["trigger_event_no_adjacent_nhit"] = data["trigger_event_no_adjacent_nhit"]
+    
+    return runNumber, data["checks"], subRunChecks , runInformation
