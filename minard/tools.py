@@ -2,6 +2,7 @@ from __future__ import print_function
 from datetime import datetime
 import calendar
 import json
+import simplejson
 import sys
 
 def total_seconds(td):
@@ -39,7 +40,8 @@ def import_SMELLIEDQ_ratdb(ratdbFile):
     runNumber = int(ratdbFile[-13:-9])
     json_data = open(ratdbFile).read()
     print("FILE:  "+str(ratdbFile))
-    data = json.loads(json_data)
+    json_data = json_data.replace("inf","-9999999")
+    data = simplejson.loads(json_data)
     runInformation =  {}
     subRunChecks = []
     subRunChecks.append(data["smellieFibreCheckSubrun"])

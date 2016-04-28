@@ -609,7 +609,7 @@ def calibdq_tellie():
     root_dir = "/home/mark/Documents/PHD/DQTests/TELLIEDQTest/"
     ratOutputs = os.listdir(root_dir)
     for files in ratOutputs:
-        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and "p2" in files:
+        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and "p2" in files and ".sw" not in files:
             print(files)
             run_num, check_params, runInformation =  import_TELLIEDQ_ratdb(os.path.join(root_dir,files))
             if "dqtellieproc" in check_params:
@@ -629,7 +629,7 @@ def calibdq_tellie_run_number(run_number):
     root_tellie_dir = "/home/mark/Documents/PHD/DQTests/TELLIEDQTest/"
     ratOutputs = os.listdir(root_tellie_dir)
     for files in ratOutputs:
-        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and "p2" and run_number in files:
+        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and "p2" and run_number in files and ".sw" not in files:
             print(files)
             run_num, check_params, runInformation =  import_TELLIEDQ_ratdb(os.path.join(root_tellie_dir,files))
     
@@ -697,14 +697,13 @@ def calibdq_smellie_subrun_number(run_number,subrun_number):
     #Sort the entire array by check number
     images.sort(key= lambda x : int(x[x.find("Check")+5]))
     #Sort the images for check 1
-    images[:3] = sorted(images[:3])
+    images[:4] = sorted(images[:4])
     #Swap two elements to make the trigger cut plots together
-    images[2], images[3]  =  images[3], images[2]
+    images[1], images[2]  =  images[2], images[1]
     #Sort the images for check 3
     images[5:6] = sorted(images[5:6])
     #Sort the images for check 3
     images[7:] = sorted(images[7:])
-    print(images)
     #Array to store the titles of the plots
     titleArray = ["Hit Maps for all Events","Hit Maps for events passing the trigger cut","Hit Maps for events failing the trigger cut","NHits Plots for all trigger types","NHits vs Trigger Type","NHits vs time between events","Time between events passing the trigger cut","First Peak Hit Map","Second Peak Hit Map"]
     for image in images:
