@@ -26,50 +26,55 @@
                 
                 <tbody>
                 <tr>
-                    <td>Expected Number of TELLIE events </td> <td>{{runInformation["numberexpected_smellie_events"][i]}}</td>
+                    <td>Expected Number of SMELLIE events </td> <td>{{(runInformation["number_events_expected_subrun"])[subrun_number | int]}}</td>
                 </tr>
                 <tr>
-                    <td>Actual Number of TELLIE events </td> <td>{{runInformation["actual_tellie_events"]}}</td>
-                </tr>
-
-                <tr>
-                    <td>Average NHit</td> <td>{{runInformation["average_nhit"]}}</td>
-                </tr>
-                
-                <tr>
-                    <td>Greater Than 1000 Nhit Events </td> <td>{{runInformation["greaterThanMaxNHitEvents"]}}</td>
-                </tr>
-                
-                <tr>
-                    <td>Fibre Firing</td> <td>{{runInformation["fibre_firing"]}}</td>
-                </tr>
-                
-                <tr>
-                    <td>Calculated Fibre Firing</td> <td>{{runInformation["fibre_firing_guess"]}}</td>
+                    <td>Actual Number of triggered  SMELLIE events </td> <td>{{(runInformation["number_events_seen_subrun"])[subrun_number | int]}}</td>
                 </tr>
 
                 <tr>
-                    <td>Number of TAC peaks (Should be 3)</td> <td>{{runInformation["peak_number"]}}</td>
+                    <td>SMELLIE events passing NHit and Trigger Cut</td> <td>{{(runInformation["events_passing_nhit_and_trigger"])[subrun_number | int]}}</td>
                 </tr>
 
                 <tr>
-                    <td>Pre peak TAC count </td> <td>{{runInformation["pre_peak_adc_count"]}}</td>
+                    <td>SMELLIE events passing NHit and failing Trigger Cut (Missing Triggers)</td> <td>{{(runInformation["events_passing_nhit_failing_trigger"])[subrun_number | int]}}</td>
+                </tr>
+                
+                <tr>
+                    <td>SMELLIE events failing NHit and passing Trigger Cut (Extra Triggers)</td> <td>{{(runInformation["events_failing_nhit_passing_trigger"])[subrun_number | int]}}</td>
                 </tr>
 
                 <tr>
-                    <td>Prompt peak TAC count </td> <td>{{runInformation["prompt_peak_adc_count"]}}</td>
+                    <td>SMELLIE NHit Events with an Adjacent Trigger Event</td> <td>{{(runInformation["nhit_event_next_to_trigger_event"])[subrun_number | int]}}</td>
+                </tr>
+
+                <tr>
+                    <td>SMELLIE NHit Events with no  Adjacent Trigger Event</td> <td>{{(runInformation["nhit_event_no_adjacent_trigger"])[subrun_number | int]}}</td>
+                </tr>
+
+                <tr>
+                    <td>SMELLIE Trigger Events with no Adjacent NHit Event</td> <td>{{(runInformation["trigger_event_no_adjacent_nhit"])[subrun_number | int ]}}</td>
                 </tr>
                 
                 <tr>
-                    <td>Late peak TAC count </td> <td>{{runInformation["late_peak_adc_count"]}}</td>
+                    <td>Average NHit for SMELLIE events</td> <td>{{(runInformation["mean_nhit_smellie_trigger_subrun"])[subrun_number | int]}}</td>
+                </tr>
+                
+                
+                <tr>
+                    <td>Fibre Firing</td> <td>{{(runInformation["fibre_expected_subrun"])[subrun_number | int ]}}</td>
                 </tr>
                 
                 <tr>
-                    <td>Run Time</td> <td>{{runInformation["run_length"]}}</td>
+                    <td>Calculated Fibre Firing</td> <td>{{(runInformation["fibre_calculated_subrun"])[subrun_number | int ]}}</td>
                 </tr>
-                
+
                 <tr>
-                    <td>Proportion of TELLIE events with correct pulse delay seperation </td> <td>{{runInformation["pulse_delay_correct_proportion"]}}</td>
+                    <td>Expected Laser Frequency </td> <td>{{(runInformation["frequency_expected_subrun"])[subrun_number | int]}}</td>
+                </tr>
+
+                <tr>
+                    <td>Calculated Laser Frequency </td> <td>{{(runInformation["frequency_actual_subrun"])[subrun_number | int]}}</td>
                 </tr>
 
                 </tbody>

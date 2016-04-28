@@ -652,9 +652,9 @@ def calibdq_smellie():
     root_dir = "/home/mark/Documents/PHD/DQTests/SMELLEIDQTest/"
     ratOutputs = os.listdir(root_dir)
     for files in ratOutputs:
-        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files:
+        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and ".sw" not in files:
            print(files)
-           run_num, check_params, subRunCheck=  import_SMELLIEDQ_ratdb(os.path.join(root_dir,files))
+           run_num, check_params, subRunCheck, runInformation =  import_SMELLIEDQ_ratdb(os.path.join(root_dir,files))
            if "DQSmellieProc" in check_params:
                run_numbers.append(run_num)
                run_info.append(check_params["DQSmellieProc"])
@@ -669,7 +669,7 @@ def calibdq_smellie_run_number(run_number):
     root_dir = "/home/mark/Documents/PHD/DQTests/SMELLEIDQTest/"
     ratOutputs = os.listdir(root_dir)
     for files in ratOutputs:
-        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files:
+        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and ".sw" not in files:
            run_num, check_params, subRunCheck, runInformation =  import_SMELLIEDQ_ratdb(os.path.join(root_dir,files))
            if run_num == int(run_number):
                if "DQSmellieProc" in check_params:
@@ -684,7 +684,7 @@ def calibdq_smellie_subrun_number(run_number,subrun_number):
     root_dir = "/home/mark/Documents/PHD/DQTests/SMELLEIDQTest/"
     ratOutputs = os.listdir(root_dir)
     for files in ratOutputs:
-        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files:
+        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and ".sw" not in files:
            run_num, check_params, subRunCheck, runInformation =  import_SMELLIEDQ_ratdb(os.path.join(root_dir,files))
            if run_num == int(run_number):
                if "DQSmellieProc" in check_params:

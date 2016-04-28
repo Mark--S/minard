@@ -17,7 +17,6 @@ def import_TELLIEDQ_ratdb(ratdbFile):
     runNumber = int(ratdbFile[-13:-9])
     json_data = open(ratdbFile).read()
     data = json.loads(json_data)
-    print(data)
     #Get the runinformation from the tellie dq output
     runInformation = {}
     runInformation["expected_tellie_events"] = data["expected_tellie_events"]
@@ -39,6 +38,7 @@ def import_TELLIEDQ_ratdb(ratdbFile):
 def import_SMELLIEDQ_ratdb(ratdbFile):
     runNumber = int(ratdbFile[-13:-9])
     json_data = open(ratdbFile).read()
+    print("FILE:  "+str(ratdbFile))
     data = json.loads(json_data)
     runInformation =  {}
     subRunChecks = []
