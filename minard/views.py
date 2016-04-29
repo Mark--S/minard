@@ -649,7 +649,7 @@ def calibdq_tellie_run_number(run_number):
 def calibdq_smellie():
     run_numbers = []
     run_info = []
-    root_dir = "/home/mark/Documents/PHD/DQTests/SMELLEIDQTest/"
+    root_dir = os.path.join(os.environ["MINARD_DQ_RATDB_DIR"],"SMELLIE")
     ratOutputs = os.listdir(root_dir)
     for files in ratOutputs:
         if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and ".sw" not in files:
@@ -666,7 +666,7 @@ def calibdq_smellie_run_number(run_number):
     run_num = 0
     run_info = []
     subRunChecks = 0
-    root_dir = "/home/mark/Documents/PHD/DQTests/SMELLEIDQTest/"
+    root_dir = os.path.join(os.environ["MINARD_DQ_RATDB_DIR"],"SMELLIE")
     ratOutputs = os.listdir(root_dir)
     for files in ratOutputs:
         if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and ".sw" not in files:
@@ -681,7 +681,7 @@ def calibdq_smellie_run_number(run_number):
 @app.route('/calibdq_smellie/<run_number>/<subrun_number>')
 def calibdq_smellie_subrun_number(run_number,subrun_number):
     rinInfo = {}
-    root_dir = "/home/mark/Documents/PHD/DQTests/SMELLEIDQTest/"
+    root_dir = os.path.join(os.environ["MINARD_DQ_RATDB_DIR"],"SMELLIE")
     ratOutputs = os.listdir(root_dir)
     for files in ratOutputs:
         if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and ".sw" not in files:
@@ -692,7 +692,7 @@ def calibdq_smellie_subrun_number(run_number,subrun_number):
     run_num = 0
     plots = []
     subRunChecks = 0
-    root_dir = os.path.join(app.static_folder,"images/SMELLIEDQPlots_"+str(run_number),"subrun_"+str(subrun_number))
+    root_dir = os.path.join(app.static_folder,"images/DQ/SMELLIEDQPlots_"+str(run_number),"subrun_"+str(subrun_number))
     images = os.listdir(root_dir)
     #Sort the entire array by check number
     images.sort(key= lambda x : int(x[x.find("Check")+5]))
@@ -707,7 +707,7 @@ def calibdq_smellie_subrun_number(run_number,subrun_number):
     #Array to store the titles of the plots
     titleArray = ["Hit Maps for all Events","Hit Maps for events passing the trigger cut","Hit Maps for events failing the trigger cut","NHits Plots for all trigger types","NHits vs Trigger Type","NHits vs time between events","Time between events passing the trigger cut","First Peak Hit Map","Second Peak Hit Map"]
     for image in images:
-        img_url = url_for("static",filename=os.path.join("images/SMELLIEDQPlots_"+str(run_number)+"/subrun_"+str(subrun_number),image))
+        img_url = url_for("static",filename=os.path.join("images/DQ/SMELLIEDQPlots_"+str(run_number)+"/subrun_"+str(subrun_number),image))
         print(img_url)
         plots.append(img_url)
     return render_template('calibdq_smellie_subrun.html',run_number=run_number,subrun_number=subrun_number,plots=plots, titles=titleArray, runInformation = runInfo) 
