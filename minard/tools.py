@@ -46,9 +46,7 @@ def import_SMELLIEDQ_ratdb(ratdbFile):
     subRunChecks = []
     subRunChecks.append(data["smellieFibreCheckSubrun"])
     subRunChecks.append(data["smellieNumberOfEventsSubrun"])
-    subRunChecks.append(data["smelliePeakRatioSubrun"])
     subRunChecks.append(data["smellieFrequencyCheckSubrun"])
-    subRunChecks.append( data["smellieNPeaksSubrun"])
     subRunChecks.append(data["smellieIntensityCheckSubrun"])
     runInformation["events_failing_nhit_failing_trigger"] = data["events_failing_nhit_failing_trigger"] 
     runInformation["events_failing_nhit_passing_trigger"] = data["events_failing_nhit_passing_trigger"]

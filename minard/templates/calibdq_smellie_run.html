@@ -14,9 +14,7 @@
                     <th>Subrun Number</th>
                     <th>Correct Fibre</th>
                     <th>Correct Number of Events</th>
-                    <th>Correct Peak Ratio</th>
                     <th>Correct Laser Frequency</th>
-                    <th>Correct Number of Peaks</th>
                     <th>Correct Laser Intensity</th>
                 </tr>
             </thead>
@@ -49,17 +47,6 @@
                     <td><font color="red">Fail</font></td>
                     {% endif %}
 
-                    {% if subRunChecks[4][i] == 1 %} 
-                    <td>Pass</td>
-                    {% else %}
-                    <td><font color="red">Fail</font></td>
-                    {% endif %}
-
-                    {% if subRunChecks[5][i] == 1 %} 
-                    <td>Pass</td>
-                    {% else %}
-                    <td><font color="red">Fail</font></td>
-                    {% endif %}
                 </tr> 
                 {% endfor %}
             </tbody>

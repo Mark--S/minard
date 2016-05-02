@@ -14,9 +14,7 @@
                     <th>Run Number</th>
                     <th>Correct Fibre</th>
                     <th>Correct Number of Events</th>
-                    <th>Correct Peak Ratio</th>
                     <th>Correct Laser Frequency</th>
-                    <th>Correct Number of Peaks</th>
                     <th>Correct Laser Intensity</th>
                 </tr>
             </thead>
@@ -37,19 +35,7 @@
                     <td><font color="red">Fail</font></td>
                     {% endif %}
                     
-                    {% if run_info[i]["smelliePeakRatio"] == 1 %} 
-                    <td>Pass</td>
-                    {% else %}
-                    <td><font color="red">Fail</font></td>
-                    {% endif %}
-
                     {% if run_info[i]["smellieFrequencyCheck"] == 1 %} 
-                    <td>Pass</td>
-                    {% else %}
-                    <td><font color="red">Fail</font></td>
-                    {% endif %}
-
-                    {% if run_info[i]["smellieNPeaks"] == 1 %} 
                     <td>Pass</td>
                     {% else %}
                     <td><font color="red">Fail</font></td>
