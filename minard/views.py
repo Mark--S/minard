@@ -705,7 +705,7 @@ def calibdq_smellie_subrun_number(run_number,subrun_number):
     #Sort the images for check 3
     images[7:] = sorted(images[7:])
     #Array to store the titles of the plots
-    titleArray = ["Hit Maps for all Events","Hit Maps for events passing the trigger cut","Hit Maps for events failing the trigger cut","NHits Plots for all trigger types","NHits vs Trigger Type","NHits vs time between events","Time between events passing the trigger cut","First Peak Hit Map","Second Peak Hit Map"]
+    titleArray = ["Hit Maps for all Events","Hit Maps for events passing the trigger cut","Hit Maps for events failing the trigger cut","NHits Plots for all trigger types","NHits vs Trigger Type","NHits vs time between events","Time between events passing the trigger cut","First Peak Hit Map","Second Peak Hit Map","100th Point on CAEN trace distribution"]
     for image in images:
         img_url = url_for("static",filename=os.path.join("images/DQ/SMELLIEDQPlots_"+str(run_number)+"/subrun_"+str(subrun_number),image))
         print(img_url)
