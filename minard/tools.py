@@ -41,6 +41,9 @@ def import_SMELLIEDQ_ratdb(ratdbFile):
     json_data = open(ratdbFile).read()
     print("FILE:  "+str(ratdbFile))
     json_data = json_data.replace("inf","-9999999")
+    json_data = json_data.replace("-nan","-9999999")
+    json_data = json_data.replace("nan","-9999999")
+    print(json_data)
     data = simplejson.loads(json_data)
     runInformation =  {}
     subRunChecks = []
