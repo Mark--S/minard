@@ -60,7 +60,6 @@ def import_SMELLIEDQ_ratdb(ratdbFile):
     runInformation["nhit_event_next_to_trigger_event"] = data["nhit_event_next_to_trigger_event"]
     runInformation["nhit_event_no_adjacent_trigger"] = data["nhit_event_no_adjacent_trigger"]
     runInformation["number_events_expected_subrun"] = data["number_events_expected_subrun"]
-    runInformation["number_events_seen_subrun"] = data["number_events_seen_subrun"]
     runInformation["trigger_event_no_adjacent_nhit"] = data["trigger_event_no_adjacent_nhit"]
     
     return runNumber, data["checks"], subRunChecks , runInformation
