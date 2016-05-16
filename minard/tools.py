@@ -16,6 +16,7 @@ def parseiso(timestr):
 
 def import_TELLIEDQ_ratdb(ratdbFile):
     runNumber = int(ratdbFile[-13:-9])
+    print(ratdbFile)
     json_data = open(ratdbFile).read()
     data = json.loads(json_data)
     #Get the runinformation from the tellie dq output
@@ -26,12 +27,26 @@ def import_TELLIEDQ_ratdb(ratdbFile):
     runInformation["greaterThanMaxNHitEvents"] = data["more_max_nhit_events"]
     runInformation ["fibre_firing"] = data["fibre_firing"]
     runInformation["fibre_firing_guess"] = data["fibre_firing_guess"]
-    runInformation["peak_number"] = data["peak_number"]
+    runInformation["peak_number"] = data["peak_numbers"]
     runInformation["prompt_peak_adc_count"] = data["prompt_peak_adc_count"]
     runInformation["pre_peak_adc_count"] = data["pre_peak_adc_count"]
     runInformation["late_peak_adc_count"] = data["late_peak_adc_count"]
-    runInformation["run_length"] = data["run_length"]
+    runInformation["subrun_run_times"] = data["subrun_run_times"]
     runInformation["pulse_delay_correct_proportion"]  = data["pulse_delay_efficiency"]
+
+    #Run Information for the subruns
+    runInformation["subrun_numbers"] = data["subrun_numbers"]
+    runInformation["avg_nhit_check_subruns"] = data["avg_nhit_check"]
+    runInformation["max_nhit_check_subruns"] = data["max_nhit_check"]
+    runInformation["peak_number_check_subruns"] = data["peak_number_check"]
+    runInformation["prompt_peak_amplitude_check_subruns"] = data["prompt_peak_amplitude_check"]
+    runInformation["prompt_peak_adc_count_check_subruns"] = data["prompt_peak_adc_count_check"]
+    runInformation["adc_peak_time_spacing_check_subruns"] = data["adc_peak_time_spacing_check"]
+    runInformation["pulse_delay_efficiency_check_subruns"] = data["pulse_delay_efficiency_check"]
+    runInformation["subrun_run_length_check"] = data["subrun_run_length_check"]
+    runInformation["correct_fibre_check_subruns"] = data["correct_fibre_check"]
+    runInformation["trigger_check_subruns"] = data["trigger_check"]
+    print(runInformation)
 
     return runNumber, data["checks"], runInformation
 

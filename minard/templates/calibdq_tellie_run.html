@@ -1,92 +1,97 @@
 {% extends "layout.html" %}
-{% block title %}TELLIE Data Quality for run {{run_number}} {% endblock %}
+{% block title %}TLLIE Data Quality for run {{run_number}}{% endblock %}
 {% block head %}
 {{ super() }}
 {% endblock %}
 {% block body %}
 {{ super() }}
 <div class="container">
-    <div class="panel panel-default">
-        <div class="panel panel-heading">
-            <h3 class="panel-title">Run information for run {{run_number}}</h3>
-        </div>
-        <div class="panel panel-body">
-            <table class="table table-hover"> 
-                <thead>
-                    <tr>
-                        <th>
-                            Parameter
-                        </th>
-                        <th>
-                            Value
-                        </th>
-                    </tr>
-                </thead> 
-                
-                
-                <tbody>
+    <h1>TELLIE Data Quality for run {{run_number}}</h1>
+    <div class="container">
+        <table class="table table-hover">
+            <thead>
                 <tr>
-                    <td>Expected Number of TELLIE events </td> <td>{{runInformation["expected_tellie_events"]}}</td>
-                </tr>
-                <tr>
-                    <td>Actual Number of TELLIE events </td> <td>{{runInformation["actual_tellie_events"]}}</td>
-                </tr>
+                    <th>Subrun Number</th>
+                    <th>Correct Fibre</th>
+                    <th>Correct Number of Peaks</th>
+                    <th>Correct Peak Ratio</th>
+                    <th>Correct Prompt Peak Time</th>
+                    <th>Correct Peak Time Spacing</th>
+                    <th>Trigger Check</th>
+                    <th>Correct Run Length</th>
+                    <th>Correct Pulse Delay</th>
+                    <th>Correct Average NHit</th>
+                    <th>Correct Max NHit</th>
 
-                <tr>
-                    <td>Average NHit</td> <td>{{runInformation["average_nhit"]}}</td>
-                </tr>
-                
-                <tr>
-                    <td>Greater Than 1000 Nhit Events </td> <td>{{runInformation["greaterThanMaxNHitEvents"]}}</td>
-                </tr>
-                
-                <tr>
-                    <td>Fibre Firing</td> <td>{{runInformation["fibre_firing"]}}</td>
-                </tr>
-                
-                <tr>
-                    <td>Calculated Fibre Firing</td> <td>{{runInformation["fibre_firing_guess"]}}</td>
-                </tr>
 
-                <tr>
-                    <td>Number of TAC peaks (Should be 3)</td> <td>{{runInformation["peak_number"]}}</td>
                 </tr>
+            </thead>
+            <tbody>
+                {% for i in range(runInformation["subrun_numbers"]|length) %}
+                <tr>
+                    <td><a href="{{ url_for('calibdq_tellie_subrun_number',run_number=run_number,subrun_number=runInformation["subrun_numbers"][i])}}"> Subrun {{runInformation["subrun_numbers"][i]}}</a></td>
 
-                <tr>
-                    <td>Pre peak TAC count </td> <td>{{runInformation["pre_peak_adc_count"]}}</td>
-                </tr>
+                    {% if runInformation["correct_fibre_check_subruns"][i] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
 
-                <tr>
-                    <td>Prompt peak TAC count </td> <td>{{runInformation["prompt_peak_adc_count"]}}</td>
-                </tr>
-                
-                <tr>
-                    <td>Late peak TAC count </td> <td>{{runInformation["late_peak_adc_count"]}}</td>
-                </tr>
-                
-                <tr>
-                    <td>Run Time</td> <td>{{runInformation["run_length"]}}</td>
-                </tr>
-                
-                <tr>
-                    <td>Proportion of TELLIE events with correct pulse delay seperation </td> <td>{{runInformation["pulse_delay_correct_proportion"]}}</td>
-                </tr>
+                    {% if runInformation["peak_number_check_subruns"][i] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
+                    
+                    {% if runInformation["prompt_peak_amplitude_check_subruns"][i] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
 
-                </tbody>
-            </table>
+                    {% if runInformation["prompt_peak_adc_count_check_subruns"][i]== 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
+
+                    {% if runInformation["adc_peak_time_spacing_check_subruns"][i] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
+
+                    {% if runInformation["trigger_check_subruns"][i] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
+                    
+                    {% if runInformation["subrun_run_length_check"][i] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
+                    
+                    {% if runInformation["pulse_delay_efficiency_check_subruns"][i] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
+
+                    {% if runInformation["avg_nhit_check_subruns"][i] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
+                    {% if runInformation["max_nhit_check_subruns"][i] == 1 %} 
+                    <td>Pass</td>
+                    {% else %}
+                    <td><font color="red">Fail</font></td>
+                    {% endif %}
+                </tr> 
+                {% endfor %}
+            </tbody>
     </div>
-</div>
-<div class="container">
-    <h1>TELLIE Data Quality Plots for run {{run_number}} </h1>
-    {% for i in range(plots|length) %}
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">{{titles[i]}}</h3>
-        </div>
-        <div class="panel-body">
-            <img src="{{plots[i]}}" class="img-responsive center-block">
-        </div>
-    </div>
-    {% endfor %}
 </div>
 {% endblock %}
