@@ -73,7 +73,28 @@
                 <tr>
                     <td>Calculated Laser Frequency </td> <td>{{(runInformation["frequency_actual_subrun"])[subrun_number | int]}}</td>
                 </tr>
-
+                {% if runInformation["laser_type"][subrun_number | int] != "superK"%}
+                <tr>
+                    <td> Laser Type </td> <td> Fixed {{runInformation["laser_type"][subrun_number | int]}} </td>
+                </tr>
+                <tr>
+                    <td> Laser Intensity </td> <td>{{runInformation["laser_intensities"][subrun_number | int]}} </td>
+                </tr>
+                <tr>
+                    <td> Laser Intensity Estimate</td> <td>{{runInformation["fixed_laser_intensities_and_superK_wavelengths"][subrun_number | int]}} </td>
+                </tr>
+                
+                {% else %}
+                <tr>
+                    <td> Laser Type </td> <td> {{runInformation["laser_type"][subrun_number | int]}} </td>
+                </tr>
+                <tr>
+                    <td> SuperK Laser Wavelength</td> <td>{{runInformation["laser_wavelengths"][subrun_number | int]}} </td>
+                </tr>
+                <tr>
+                    <td> SuperK  Laser Wavelength Estimate</td> <td>{{runInformation["fixed_laser_intensities_and_superK_wavelengths"][subrun_number | int]}} </td>
+                </tr>
+                {% endif %}
                 </tbody>
             </table>
     </div>

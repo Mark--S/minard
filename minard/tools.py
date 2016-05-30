@@ -4,6 +4,7 @@ import calendar
 import json
 import simplejson
 import sys
+import re
 
 def total_seconds(td):
     """Returns the total number of seconds contained in the duration."""
@@ -15,7 +16,8 @@ def parseiso(timestr):
     return calendar.timegm(dt.timetuple()) + dt.microsecond/1e6
 
 def import_TELLIEDQ_ratdb(ratdbFile):
-    runNumber = int(ratdbFile[-13:-9])
+    runNumber = int(re.search('DATAQUALITY_RECORDS_(.*)_p', ratdbFile).group(1))
+    print("RUN NUMBER: "+str(runNumber))
     print(ratdbFile)
     json_data = open(ratdbFile).read()
     data = json.loads(json_data)
@@ -52,7 +54,8 @@ def import_TELLIEDQ_ratdb(ratdbFile):
 
 
 def import_SMELLIEDQ_ratdb(ratdbFile):
-    runNumber = int(ratdbFile[-13:-9])
+    runNumber = int(re.search('DATAQUALITY_RECORDS_(.*)_p', ratdbFile).group(1))
+    print("RUN NUMBER: "+str(runNumber))
     json_data = open(ratdbFile).read()
     print("FILE:  "+str(ratdbFile))
     json_data = json_data.replace("inf","-9999999")
@@ -79,5 +82,10 @@ def import_SMELLIEDQ_ratdb(ratdbFile):
     runInformation["nhit_event_no_adjacent_trigger"] = data["nhit_event_no_adjacent_trigger"]
     runInformation["number_events_expected_subrun"] = data["number_events_expected_subrun"]
     runInformation["trigger_event_no_adjacent_nhit"] = data["trigger_event_no_adjacent_nhit"]
+    print(data)
+    runInformation["laser_type"] = data["laser_type"]
+    runInformation["laser_wavelengths"] = data["laser_wavelengths"]
+    runInformation["laser_intensities"] = data["laser_intensities"]
+    runInformation["fixed_laser_intensities_and_superK_wavelengths"] = data["fixed_intensities_and_superk_wavelengths"]
     
     return runNumber, data["checks"], subRunChecks , runInformation
