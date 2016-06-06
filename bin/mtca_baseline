@@ -23,6 +23,8 @@ def PutBaselinesInDatabase(host):
 
     baselines = {}
     for name, mtc_name in DBToMTC.iteritems():
+	# mtc server returns baselines in mV so we divide by 1000 to convert
+	# to volts.
 	baselines[name] = float(mtc.send('threshmon %s' % mtc_name))/1000
 
     for interval in INTERVALS:
