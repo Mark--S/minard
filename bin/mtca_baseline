@@ -14,51 +14,12 @@ DBToMTC = {"100H":"N100HI","100M":"N100MED","100L":"N100LO",
 "20":"N20","20LB":"N20LB","ESUMH":"ESUMHI","ESUML":"ESUMLO",
 "OWLEH":"OWLEHI","OWLEL":"OWLELO","OWLN":"OWLN"}
 
-def retry(tries=None, delay=1, backoff=2):
-    """
-    Retry a function if it throws an Exception.
-
-    tries should be the number of tries, delay is the initial delay in
-    seconds, and backoff is the factor by which the delay is multiplied
-    after each failure.
-
-    See https://wiki.python.org/moin/PythonDecoratorLibrary#Retry
-    """
-    
-    def decorator(f):
-
-	@wraps(f)
-	def wrapper(*args, **kwargs):
-	    mtries, mdelay = tries, delay
-
-	    while mtries is None or mtries > 1:
-		try:
-		    return f(*args, **kwargs)
-		except Exception as e:
-		    if mtries is not None:
-			mtries -= 1
-
-		    time.sleep(mdelay)
-
-		    mdelay *= backoff
-
-	    return f(*args, **kwargs)
-
-	return wrapper
-
-    return decorator
-
-@retry()
 def PutBaselinesInDatabase(host):
     redis = Redis()
     p = redis.pipeline()
     now = int(time.time())
 
-    try:
-        mtc = MTC(host)
-    except Exception as e:
-        log.warn("Could not connect to MTC: %s" % str(e))
-        raise
+    mtc = MTC(host)
 
     baselines = {}
     for name, mtc_name in DBToMTC.iteritems():
@@ -130,8 +91,19 @@ if __name__ == '__main__':
 			     (args.log_server, str(e)))
 	    sys.stderr.flush()
 
-    PutBaselinesInDatabase(args.host)
-
-    while (args.loop_forever):
-        time.sleep(0.5)
-        PutBaselinesInDatabase(args.host)
+    if args.loop_forever:
+	while True:
+	    try:
+		PutBaselinesInDatabase(args.host)
+	    except KeyboardInterrupt:
+		break
+	    except Exception as e:
+		log.warn("couldn't update MTCA baselines: %s" % str(e))
+		time.sleep(3600)
+	    else:
+		time.sleep(0.5)
+    else:
+	try:
+	    PutBaselinesInDatabase(args.host)
+	except Exception as e:
+	    log.warn("couldn't update MTCA baselines: %s" % str(e))

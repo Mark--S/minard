@@ -64,34 +64,34 @@ nginx
 * **Log File**: ``/var/log/nginx/error.log`` and ``/var/log/nginx/access.log``
 * **Description**: nginx web server which serves static files and slow clients for the main site.
 
-orca_producer
+data_producer
 -------------
 
-* **Command**: ``orca_producer [--host HOST] [--port PORT]``
+* **Command**: ``data_producer [--host HOST] [--port PORT]``
 * **Run as**: minard
 * **Ports**: 5557, 5558
 * **Started by**: supervisord
-* **Log File**: ``/var/log/minard/orca_producer.log``
-* **Description**: Reads CMOS rates and base current records from the ORCA data stream and pushes them to ZMQ push/pull sockets for processing.
+* **Log File**: ``/var/log/minard/data_producer.log``
+* **Description**: Reads CMOS rates and base current records from the data stream and pushes them to ZMQ push/pull sockets for processing.
 
-orca_consumer_cmos
+data_consumer_cmos
 ------------------
 
-* **Command**: ``orca_consumer 5557``
+* **Command**: ``data_consumer 5557``
 * **Run as**: minard
 * **Ports**: 5557
 * **Started by**: supervisord
-* **Log File**: ``/var/log/minard/orca_consumer_cmos.log``
+* **Log File**: ``/var/log/minard/data_consumer_cmos.log``
 * **Description**: Reads CMOS rates from a ZMQ push/pull socket and writes to the redis database.
 
-orca_consumer_base
+data_consumer_base
 ------------------
 
-* **Command**: ``orca_consumer 5558``
+* **Command**: ``data_consumer 5558``
 * **Run as**: minard
 * **Ports**: 5558
 * **Started by**: supervisord
-* **Log File**: ``/var/log/minard/orca_consumer_base.log``
+* **Log File**: ``/var/log/minard/data_consumer_base.log``
 * **Description**: Reads base currents from a ZMQ push/pull socket and writes to the redis database.
 
 supervisord

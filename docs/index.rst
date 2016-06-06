@@ -15,7 +15,7 @@ Contents:
    quickstart
    data
    dispatch_local
-   mimic_orca
+   mimic_data
    alarms
    production
    monitoring_software

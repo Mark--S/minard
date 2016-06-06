@@ -1,167 +1,168 @@
+{% macro collapsible_header(title,name) %}
+<div class="row">
+   <div class="panel-group">
+       <div class="panel panel-default">
+           <div class="panel-heading">
+               <h4 class="panel-title">
+                   <a data-toggle="collapse" href="#collapse{{name}}">
+                       {{title}}
+                   </a>
+               </h4>
+           </div>
+           <div id="collapse{{name}}" class="panel-collapse collapse out">
+               <div class='panel-body' id='{{name}}'>
+               {{ caller() }}
+               </div>
+           </div>
+       </div>
+    </div>
+</div>
+{% endmacro %}
 {% extends "layout.html" %}
-{% block title %}State{% endblock %}
+{% block title %}Detector State{% endblock %}
 {% block head %}
     {{ super() }}
 {% endblock %}
 {% block body %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/detector_state.css') }}" media="screen">
     {{ super() }}
     <div class="container">
         {% if err %}
+	    <div class="alert alert-danger" role="alert">
+	    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
             Error talking to the DB : {{ err }}
+	    </div>
         {% else %}
-	    <center><h1> Run {{ run }} </h1></center>
+	    <div class="row">
+		<div class="col-md-6 col-md-offset-3">
+		    <center id="run_title">
+			<ul class="pager">
+			    <li class="previous"><a href="{{ url_for('state', run=run-1) }}">Prev</a></li>
+			    <li><h1 style="display:inline"> Run {{ run }} </h2></li>
+			    <li class="next"><a href="{{ url_for('state', run=run+1) }}">Next</a></li>
+			</ul>
+		    </center>
+		</div>
+	    </div>
             {% if mtc_state %}
-                mtc_stuff </br>
-                <div id="mtc"></div>
-                    <ul>
-                    {% for key,val in mtc_state.iteritems() %}
-                        <li>{{ key}} = {{val}}</li>
-                    {% endfor %}
-                    </ul>
+                {% call collapsible_header('MTC','mtc') %}
+                {% endcall %}
             {% endif %}
             {% if caen_state %}
-                caen stuff</br>
+                {% call collapsible_header('CAEN','CAEN') %}
                     <ul>
                     {% for key,val in caen_state.iteritems() %}
-                        <li>{{ key}} = {{val}}</li>
+                        <li> {{key}} = {{ val }} </li>
                     {% endfor %}
                     </ul>
+                {% endcall %}
             {% endif %}
             {% if detector_control_state %}
-                    detector controll stuff </br>
-                    <ul>
-                    {% for key,val in detector_control_state.iteritems() %}
-                        <li>{{ key}} = {{val}}</li>
-                    {% endfor %}
-                    </ul>
+                {% call collapsible_header('Detector Control','detector_control') %}
+                {% endcall %}
             {% endif %}
-            {% for i in range(20) %}
-                 {% if crates_state[i] %}
-                    display crate {{i}} stuff
-                {% endif %}
-            {% endfor %}
-            {% if run_state %}
-                run stuff</br>
-                <ul>
-                {% for key,val in run_state.iteritems() %}
-                    <li>{{ key }} = {{val }} </li>
-                {% endfor %}
-                </ul>
+            {% if crates_state %}
+                {% call collapsible_header('Crates','allCrates') %}
+                   {% call collapsible_header('N100 Triggers','N100Triggers') %}
+                   {% endcall %}
+                   {% call collapsible_header('N20 Triggers','N20Triggers') %}
+                   {% endcall %}
+                   {% call collapsible_header('Sequencers','Sequencers') %}
+                   {% endcall %}
+                   {% for i in range(20) %}
+                       {% if crates_state[i] %}
+                           {% call collapsible_header('Crate %i' % i,'crate%i' % i) %}
+                               {% for j in range(0,16) %}
+                                   {% call collapsible_header('Crate %i MB %i' % (i,j), 'Crate%iMB%i' % (i,j)) %}
+                                        <ul>
+                                        {% for key in crates_state[i][j] %}
+                                            <li>{{key}} = {{crates_state[i][j][key]}}</li>
+                                        {% endfor %}
+                                        </ul>
+                                   {% endcall %}
+                               {% endfor %}
+                           {% endcall %}
+                       {% endif %}
+                   {% endfor %}
+                {% endcall %}
             {% endif %}
-        {% endif %}
+    {% endif %}
     </div>
 {% endblock %}
 {% block script %}
-    <script src="{{ url_for('static', filename='js/d3.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/colorbrewer.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/d3.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/crate.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/histogram.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/detector_state.js') }}"></script>
     <script type="text/javascript">
-        var mtc_data = {{mtc_state |tojson |safe }};
+        var mtc_data = {{ mtc_state | mtc_human_readable | tojson |safe }};
+        var caen_data = {{ caen_state | caen_human_readable | tojson |safe }};
+        var crates_data = {{ crates_state | all_crates_human_readable |tojson |safe }};
 
-        function display_triggers(maskVal) {
-            var wordlist=[];
-            var bit_to_string ={
-                                0 :"NHIT100LO",
-                                1 :"NHIT100MED",
-                                2 :"NHIT100HI",
-                                3 :"NHIT20",
-                                4 :"NHIT20LB",
-                                5 :"ESUMLO",
-                                6 :"ESUMHI",
-                                7 :"OWLN",
-                                8 :"OWLELO",
-                                9 :"OWLEHI",
-                                10:"PULSE_GT",
-                                11:"PRESCALE",
-                                12:"PEDESTAL",
-                                13:"PONG",
-                                14:"SYNC",
-                                15:"EXT_ASYNC",
-                                16:"EXT2",
-                                17:"EXT3",
-                                18:"EXT4",
-                                19:"EXT5",
-                                20:"EXT6",
-                                21:"EXT7",
-                                22:"EXT8_PULSE_ASYNC",
-                                23:"SPECIAL_RAW",
-                                24:"NCD",
-                                25:"SOFT_GT"
-                                };
-            for(i=25;i>=0;i--) {
-                if( (maskVal & 1<<i) >0){
-                    wordlist.push(bit_to_string[i]);
-                }
-            }
-            var mtc = d3.select('#mtc');
-            mtc.append("h3").text("Enabled Triggers");
-            var trig_list = d3.select('#mtc').append('ul');
-            trig_list.selectAll('li')
-                     .data(wordlist)
-                     .enter()
-                     .append('li')
-                     .text(function(d){ return d;});
-        };
+        var run_data = false;
+        var det_cont_info = false;
+        {% if run_state %}
+            run_data = {{ run_state | tojson | safe }}
+        {% endif %}
+        {% if detector_control_state %}
+            det_cont_info  = {{ detector_control_state | tojson | safe }};
+        {% endif %}
+        if(crates_data) {
+            var N100 = d3.select("#N100Triggers")
+            var N20 = d3.select("#N20Triggers")
+            var Seq = d3.select("#Sequencers")
+            var width = N100.node().parentElement.parentElement.clientWidth
+            var height = 500;
+            sizeinfo = {};
+            sizeinfo.width = width;
+            sizeinfo.height = height;
+            display_crate_view('n100_triggers',crates_data,sizeinfo,N100)
+            display_crate_view('n20_triggers',crates_data,sizeinfo,N20)
+            display_crate_view('sequencers',crates_data,sizeinfo,Seq)
+        }
+        if (mtc_data) {
 
-        function display_ped_delay(coarseDelay_mask,fineDelay_mask) {
-            MIN_GT_DELAY = 18.35; //Taken from daq/src/mtc.c
-            AddelSlope = 0.1; //Taken from daq/src/mtc.c
-            var coarseDelay = ((~coarseDelay_mask)>>>0)*10;
-            var fine_delay = (fineDelay_mask & 0xFF) * AddelSlope;
-            var delay = coarseDelay + fine_delay;
-            var mtc = d3.select('#mtc')
-            mtc.append("h3").text("Pedestal Delay = "+ delay.toString());
-
-        };
-        function display_lockout_width(lockoutMask) {
-            var lockout = (~lockoutMask) & 0xFF;
-            lockout*=20
-            var mtc = d3.select('#mtc')
-            mtc.append("h3").text("Lockout Width = "+ lockout.toString());
-        };
-        function display_control_reg(control_reg) {
-            var mtc = d3.select('#mtc');
-            var wordlist = [];
-            bit_to_string = {
-             0: "PED_EN",
-             1: "PULSE_EN",
-             2: "LOAD_ENPR",
-             3: "LOAD_ENPS",
-             4: "LOAD_ENPW",
-             5: "LOAD_ENLK",
-             6: "ASYNC_EN",
-             7: "RESYNC_EN",
-             8: "TESTGT",
-             9: "TEST50",
-             10: "kTEST10",
-             11: "kLOAD_ENGT",
-             12: "kLOAD_EN50",
-             13: "kLOAD_EN10",
-             14: "kTESTMEM1",
-             15: "kTESTMEM2",
-             16: "FIFO_RESET"
+            display_triggers(mtc_data.gt_words);
+            display_ped_delay( mtc_data.ped_delay);
+            display_lockout_width(mtc_data.lockout_width);
+            display_control_reg(mtc_data.control_reg);
+            display_prescale(mtc_data.prescale);
+            var mtc = d3.select("#mtc")
+            var size_info ={};
+            size_info['width']= mtc.node().parentElement.parentElement.clientWidth
+            size_info['height']= 25;
+            display_crate_mask(mtc_data.gt_crates,mtc,"GT",size_info);
+            display_crate_mask(mtc_data.ped_crates,mtc,"PED",size_info);
+            display_crate_mask(mtc_data.N100_crates,mtc,"N100",size_info);
+            display_crate_mask(mtc_data.N20_crates,mtc,"N20",size_info);
+            display_crate_mask(mtc_data.ESUMHI_crates,mtc,"ESUM HI",size_info);
+            display_crate_mask(mtc_data.ESUMLO_crates,mtc,"ESUM LO",size_info);
+            display_crate_mask(mtc_data.OWLELO_crates,mtc,"OWLE LO",size_info);
+            display_crate_mask(mtc_data.OWLEHI_crates,mtc,"OWLE HI",size_info);
+            display_crate_mask(mtc_data.OWLN_crates,mtc,"OWLN",size_info);
+        }
+        if (run_data) {
+            display_run_type(run_data.run_type,run_data.timestamp)
+        }
+        if (det_cont_info) {
+            display_detector_control(det_cont_info);
+        }
+        if (caen_data) {
+            display_caen(caen_data);
+        }
+        resize = function() {
+            if(det_cont_info){
+                var det_cont = d3.select("#detector_control")
+                var width = det_cont.node().parentElement.parentElement.clientWidth
+                var svg = det_cont.selectAll("svg").attr("width",width);
             }
-            for(i=16;i>=0;i--) {
-                if( (control_reg & 1<<i) >0){
-                    wordlist.push(bit_to_string[i]);
-                }
+            if(mtc_data ){
+                var mtc = d3.select("#mtc")
+                var width = mtc.node().parentElement.parentElement.clientWidth
+                var svg = mtc.selectAll("svg").attr("width",width);
             }
-            console.log(wordlist);
-            mtc.append('h3').text("Control Register Values");
-            var trig_list = mtc.append('ul');
-            trig_list.selectAll('li')
-                     .data(wordlist)
-                     .enter()
-                     .append('li')
-                     .text(function(d){ return d;});
         };
-        display_triggers(mtc_data.gt_mask);
-        display_ped_delay(mtc_data.coarse_delay,mtc_data.fine_delay);
-        display_lockout_width(mtc_data.lockout_width)
-        display_control_reg(mtc_data.control_register);
+        resize()
+        window.addEventListener("resize", resize,false);
        </script>
 
-    <script>
-    </script>
 {% endblock %}

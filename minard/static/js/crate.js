@@ -123,6 +123,16 @@ function crate_view() {
 
     var scale = d3.scale.threshold().domain([100]).range(['#bababa','#ca0020']);
 
+    var coloringFunction = function(data) {
+        return function(k, i) {
+            var v = data[k];
+            if (v === null || typeof v === 'undefined' || v === 0) {
+                return 'background-color:#e0e0e0';
+            }
+            else {
+                return 'background-color:' + scale(+v);
+    }};}
+
     function chart(selection) {
         selection.each(function(data) {
         if (width === null)
@@ -161,51 +171,49 @@ function crate_view() {
 
         var select = d3.select(this).selectAll('#crate-view div table tr td')
 
-        select.attr('style', function(k, i) {
-            var v = data[k];
-            if (v === null || typeof v === 'undefined' || v === 0)
-                return 'background-color:#e0e0e0';
-            else
-                return 'background-color:' + scale(+v);
-            });
-       });}
+        select.attr('style',coloringFunction(data));
+    });}
+    chart.height = function(value) {
+        if (!arguments.length) return height;
+        height = value;
+        return chart;
+    }
 
-       chart.height = function(value) {
-           if (!arguments.length) return height;
-           height = value;
-           return chart;
-       }
+    chart.scale = function(value) {
+        if (!arguments.length) return scale;
+        scale = value;
+        return chart;
+    }
 
-       chart.scale = function(value) {
-           if (!arguments.length) return scale;
-           scale = value;
-           return chart;
-       }
+    chart.caption = function(value) {
+        if (!arguments.length) return caption;
+        caption = value;
+        return chart;
+    }
 
-       chart.caption = function(value) {
-           if (!arguments.length) return caption;
-           caption = value;
-           return chart;
-       }
+    chart.width = function(value) {
+        if (!arguments.length) return width;
+        width = value;
+        return chart;
+    }
 
-       chart.width = function(value) {
-           if (!arguments.length) return width;
-           width = value;
-           return chart;
-       }
+    chart.click = function(value) {
+        if (!arguments.length) return click;
+        click = value;
+        return chart;
+    }
 
-       chart.click = function(value) {
-           if (!arguments.length) return click;
-           click = value;
-           return chart;
-       }
-
-       chart.threshold = function(value) {
-           if (!arguments.length) return threshold;
-           threshold = value;
-           scale = d3.scale.threshold().domain([threshold]).range(['#bababa','#ca0020']);
-           return chart;
-       }
+    chart.threshold = function(value) {
+        if (!arguments.length) return threshold;
+        threshold = value;
+        scale = d3.scale.threshold().domain([threshold]).range(['#bababa','#ca0020']);
+        return chart;
+    }
+    chart.coloringFunction = function(value) {
+        if(!arguments.length) return coloringFunction;
+        coloringFunction = value;
+        return chart;
+    }
 
     return chart;
 }

@@ -1,22 +1,26 @@
 #!/bin/sh
 #
 # chkconfig: - 58 74
-# description: minard dispatch push
+# description: data consumer base
 
 . /etc/init.d/functions
 
-EXEC=/opt/minard/bin/minard_dispatch_push
+EXEC=/opt/minard/bin/data_consumer_base
 USER=minard
-LOGFILE=/var/log/minard/minard_dispatch_push.log
 MINARD_SETTINGS=/etc/minard/settings.cfg
 
 export MINARD_SETTINGS
 
+WORKERS=2
+
 case $1 in
     start)
-	echo -n "starting $EXEC"
-	daemon --user=$USER --check=$EXEC "nohup $EXEC > $LOGFILE 2>&1 &"
-	echo
+	for i in `seq 1 $WORKERS`; do
+	    echo -n "starting $EXEC"
+	    LOGFILE=/var/log/minard/data_consumer_base_$i.log
+	    daemon --user=$USER --check=$EXEC "nohup $EXEC > $LOGFILE 2>&1 &"
+	    echo
+	done
 	;;
     stop)
 	pkill -f $EXEC

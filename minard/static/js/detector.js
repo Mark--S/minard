@@ -210,7 +210,7 @@ function setup() {
     d3.select('#hist').datum([]).call(chart);
 
     // collapse histogram panel
-    $('.collapse').collapse();
+    $('#collapseOne').collapse();
 
     // set up crate view
     d3.select("#crate").datum([]).call(crate);

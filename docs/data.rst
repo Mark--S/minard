@@ -15,25 +15,25 @@ To run the dispatch processor as a daemon::
 
 To see how to set up a local dispatcher see :doc:`dispatch_local`.
 
-Orca Stream
+Data Stream
 -----------
 
-The ORCA stream is processed directly from a socket connection to ORCA. The
-stream is processed by two scripts:
+The data stream is processed directly from a socket connection to the data
+server. The stream is processed by two scripts:
 
-`orca_producer
-<https://github.com/snoplus/minard/blob/master/bin/orca_producer>`_
-    This script receives the raw data from ORCA and pushes it to different
-    sockets depending on the type of data. Currently it sends CMOS packets to
-    port 5557 and base current packets to port 5558.
+`data_producer
+<https://github.com/snoplus/minard/blob/master/bin/data_producer>`_
+    This script receives the raw data from the data stream server and pushes it
+    to different sockets depending on the type of data. Currently it sends CMOS
+    packets to port 5557 and base current packets to port 5558.
 
-`orca_consumer
-<https://github.com/snoplus/minard/blob/master/bin/orca_consumer>`_
-    This script processes the data packets pushed by the `orca_producer
-    <https://github.com/snoplus/minard/blob/master/bin/orca_producer>`_ script.
+`data_consumer
+<https://github.com/snoplus/minard/blob/master/bin/data_consumer>`_
+    This script processes the data packets pushed by the `data_producer
+    <https://github.com/snoplus/minard/blob/master/bin/data_producer>`_ script.
 
-For more information on the ORCA file formats see `Data File Format
-<http://orca.physics.unc.edu/~markhowe/Data_Format_Viewing/Data_Format.html>`_.
+For more information on the data file formats see `Data File Format
+<http://snopl.us/detector/html/daq.html>`_.
 
-To mimic the ORCA data stream see :doc:`mimic_orca`.
+To mimic the data stream see :doc:`mimic_data`.
 

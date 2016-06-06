@@ -145,8 +145,8 @@ horizon: null,
 metrics:null,
 format: my_si_format,
 click: function(d, i) {
-    if (i <= 19)
-        switch_to_crate(i);
+    if ((i > 0) && (i <= 20))
+        switch_to_crate(i-1);
     },
 state: NEEDS_UPDATE,
 slide: 0

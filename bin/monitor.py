@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+import sys
 import urllib
 import urllib2
 from base64 import b64encode
@@ -132,9 +133,7 @@ def set_up_root_logger(host, name, auth=None):
     root_logger.setLevel(logging.DEBUG)
 
 if __name__ == '__main__':
-    import sys
     import optparse
-    import sys
     import traceback
     import re
 

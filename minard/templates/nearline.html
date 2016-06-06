@@ -9,8 +9,16 @@
 	<div class="row">
 	    <div class="col-md-6 col-md-offset-3">
 		<center>
-		    <h2> Run {{ run }} </h2>
+		    <ul class="pager">
+			<li class="previous"><a href="{{ url_for('nearline', run=run-1) }}">Prev</a></li>
+			<li><h2 style="display:inline"> Run {{ run }} </h2></li>
+			<li class="next"><a href="{{ url_for('nearline', run=run+1) }}">Next</a></li>
+		    </ul>
 		</center>
+	    </div>
+	</div>
+	<div class="row">
+	    <div class="col-md-6 col-md-offset-3">
 		<table class="table">
 		    <thead>
 			<tr>
@@ -24,6 +32,12 @@
 			<th class="danger"> Failed </th>
 			{% elif status|int == 0 %}
 			<th class="success"> Success </th>
+			{% elif status|int == 2 %}
+			<th class="warning"> Warning </th>
+			{% elif status|int == 3 %}
+			<th> Debug </th>
+			{% elif status|int == 4 %}
+			<th> Not run </th>
 			{% elif status|int == 99 %}
 			<th> In Progress </th>
 			{% else %}

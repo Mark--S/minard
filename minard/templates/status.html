@@ -30,7 +30,9 @@
                             <td>{{ program.name }}</td>
                             <td>{{ program.machine }}</td>
                             <td style="text-align:center">
-                                <a href="{{ url_for('view_log', name=program.name) }}">Tail -f</a>
+				{% if program.display_log %}
+				    <a href="{{ url_for('view_log', name=program.name) }}">Tail -f</a>
+				{% endif %}
                             </td>
                             <td style="text-align:center">
                                 {% if program.link %}

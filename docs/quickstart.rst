@@ -55,7 +55,6 @@ Our page is pretty boring, so let's add a histogram! Edit `hello_world.html` to 
     {% block title %}Hello World{% endblock %}
     {% block head %}
         {{ super() }}
-        <link href="{{ url_for('static', filename='css/bar-chart.css') }}" rel="stylesheet">
         <script src="{{ url_for('static', filename='js/d3.js') }}"></script>
         <script src="{{ url_for('static', filename='js/histogram.js') }}"></script>
     {% endblock %}

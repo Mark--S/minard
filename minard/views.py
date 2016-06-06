@@ -1,6 +1,5 @@
-from __future__ import division
-from __future__ import print_function
-from minard import app
+from __future__ import division, print_function
+from . import app
 from flask import render_template, jsonify, request, redirect, url_for
 from itertools import product
 import time
@@ -9,15 +8,15 @@ from os.path import join
 import json
 from tools import total_seconds, parseiso, import_SMELLIEDQ_ratdb, import_TELLIEDQ_ratdb
 import requests
+from .tools import parseiso
 from collections import deque, namedtuple
-from timeseries import get_timeseries, get_interval, get_hash_timeseries
-from timeseries import get_timeseries_field, get_hash_interval
+from .timeseries import get_timeseries, get_interval, get_hash_timeseries
+from .timeseries import get_timeseries_field, get_hash_interval
 from math import isnan
 import os
 import sys
-
 import random
-
+import detector_state
 import pcadb
 import ecadb
 
@@ -52,12 +51,13 @@ TRIGGER_NAMES = \
 
 
 class Program(object):
-    def __init__(self, name, machine=None, link=None, description=None, expire=10):
+    def __init__(self, name, machine=None, link=None, description=None, expire=10, display_log=True):
         self.name = name
         self.machine = machine
         self.link = link
         self.description = description
         self.expire = expire
+        self.display_log = display_log
 
 redis = Redis()
 
@@ -66,21 +66,18 @@ PROGRAMS = [Program('builder','builder1', description="event builder"),
             Program('L2-convert','buffer1',
                     description="zdab -> ROOT conversion"),
             Program('L1-delete','buffer1', description="delete L1 files"),
-            Program('dflow_log',
-		    description='copy log files from ORCA and builder'),
             Program('builder_copy', 'buffer1',
                     description="builder -> buffer transfer"),
             Program('buffer_copy', 'buffer1',
                     description="buffer -> grid transfer"),
-            Program('builder_delete', 'buffer1',
-                    description="builder deletion script"),
-            Program('PCA','nlug', link='pcatellie',
-		    description="monitor PCA data"),
-            Program('ECA','nlug', link='eca', description="monitor ECA data"),
-            Program('mtc','sbc', description="mtc server"),
-            Program('data','daq1', description="data stream server"),
-            Program('xl3','daq1', description="xl3 server"),
-            Program('log','minard', description="log server")
+            Program('mtc','sbc', description="mtc server",
+		    display_log=False),
+            Program('data','daq1', description="data stream server",
+		    display_log=False),
+            Program('xl3','daq1', description="xl3 server",
+		    display_log=False),
+            Program('log','minard', description="log server",
+		    display_log=False)
 ]
 
 @app.template_filter('timefmt')
@@ -94,15 +91,11 @@ def status():
 @app.route('/state')
 @app.route('/state/<int:run>')
 def state(run=None):
-    import detector_state
-
-    if run is None:
-	run = detector_state.get_latest_run()
-
     try:
         run_state = detector_state.get_run_state(run)
-    except Exception as err:
-        return render_template('state.html',err = str(err))
+        run = run_state['run']
+    except Exception as e:
+        return render_template('state.html', err=str(e))
         
     detector_control_state = None
     if run_state['detector_control'] is not None:
@@ -121,9 +114,11 @@ def state(run=None):
         if run_state['crate'+str(iCrate)] is not None:
             crates_state[iCrate] = detector_state.get_crate_state(run_state['crate'+str(iCrate)])
 
-        
+    if not any(crates_state):
+        crates_state = None;
+
     return render_template('state.html',run=run,
-					run_state = run_state,
+                                        run_state = run_state,
                                         detector_control_state = detector_control_state,
                                         mtc_state = mtc_state,
                                         caen_state = caen_state,
@@ -137,6 +132,15 @@ def l2():
     if not request.args.get('step') or not request.args.get('height'):
         return redirect(url_for('l2',step=step,height=height,_external=True))
     return render_template('l2.html',step=step,height=height)
+
+@app.route('/trigger')
+def trigger():
+    results = detector_state.get_latest_trigger_scans()
+
+    if results is None:
+	return render_template('trigger.html', error="No trigger scans.")
+
+    return render_template('trigger.html', results=results)
 
 @app.route('/nearline')
 @app.route('/nearline/<int:run>')
@@ -379,8 +383,6 @@ def get_alarm():
 @app.route('/owl_tubes')
 def owl_tubes():
     """Returns the time series for the sum of all upward facing OWL tubes."""
-    import numpy as np
-
     name = request.args['name']
     start = request.args.get('start', type=parseiso)
     stop = request.args.get('stop', type=parseiso)
@@ -399,17 +401,28 @@ def owl_tubes():
     stop = int(stop)
     step = int(step)
 
-    values = np.zeros((len(OWL_TUBES),len(range(start,stop,step))),float)
+    values = []
     for i, id in enumerate(OWL_TUBES):
         crate, card, channel = id >> 9, (id >> 5) & 0xf, id & 0x1f
-        values[i] = get_hash_timeseries(name,start,stop,step,crate,card,channel,method)
+        values.append(get_hash_timeseries(name,start,stop,step,crate,card,channel,method))
+
+    # transpose time series from (channel, index) -> (index, channel)
+    values = zip(*values)
+
+    # filter None values in sub lists
+    values = map(lambda x: filter(lambda x: x is not None, x), values)
+
+    # convert to floats
+    values = map(lambda x: map(float, x), values)
 
     if method == 'max':
-        values = np.nanmax(values,axis=0)
+	# calculate max value in each time bin.
+        values = map(lambda x: max(x) if len(x) else None, values)
     else:
-        values = np.nanmean(values,axis=0)
+	# calculate mean value in each time bin
+        values = map(lambda x: sum(x)/len(x) if len(x) else None, values)
 
-    return jsonify(values=[None if isnan(x) else x for x in values])
+    return jsonify(values=values)
 
 @app.route('/metric_hash')
 def metric_hash():
@@ -514,7 +527,6 @@ def metric():
 
 @app.route('/eca')
 def eca():
-
     runs = ecadb.runs_after_run(0)      
     return render_template('eca.html', runs=runs)
  

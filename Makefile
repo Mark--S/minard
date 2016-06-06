@@ -31,17 +31,17 @@ install: /opt/minard/bin/activate
 	$(INSTALL) init/gunicorn_snoplus_log /etc/init.d/
 	$(INSTALL) init/minard_dispatch_push /etc/init.d/
 	$(INSTALL) init/minard_dispatch_pull /etc/init.d/
-	$(INSTALL) init/orca_producer /etc/init.d/
-	$(INSTALL) init/orca_consumer_cmos /etc/init.d/
-	$(INSTALL) init/orca_consumer_base /etc/init.d/
+	$(INSTALL) init/data_producer /etc/init.d/
+	$(INSTALL) init/data_consumer_cmos /etc/init.d/
+	$(INSTALL) init/data_consumer_base /etc/init.d/
 	$(INSTALL) init/baseline_monitor /etc/init.d/
 	chkconfig gunicorn on
 	chkconfig gunicorn_snoplus_log on
 	chkconfig minard_dispatch_push on
 	chkconfig minard_dispatch_pull on
-	chkconfig orca_producer on
-	chkconfig orca_consumer_cmos on
-	chkconfig orca_consumer_base on
+	chkconfig data_producer on
+	chkconfig data_consumer_cmos on
+	chkconfig data_consumer_base on
 	chkconfig baseline_monitor on
 
 .PHONY: install build docs

@@ -1,0 +1,18 @@
+.crate_mask circle{
+    opacity:0.75;
+}
+.crate_mask circle.on{
+    fill:green;
+}
+.crate_mask circle.off{
+    fill:grey;
+}
+.rack_mask circle{
+    opacity:0.75;
+}
+.rack_mask circle.on{
+
+}
+.rack_mask circle.off{
+    fill:grey;
+}

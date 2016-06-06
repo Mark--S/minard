@@ -1,13 +1,13 @@
 #!/bin/sh
 #
 # chkconfig: - 58 74
-# description: minard dispatch push
+# description: data producer
 
 . /etc/init.d/functions
 
-EXEC=/opt/minard/bin/minard_dispatch_push
+EXEC=/opt/minard/bin/data_producer
 USER=minard
-LOGFILE=/var/log/minard/minard_dispatch_push.log
+LOGFILE=/var/log/minard/data_producer.log
 MINARD_SETTINGS=/etc/minard/settings.cfg
 
 export MINARD_SETTINGS

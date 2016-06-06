@@ -10,6 +10,15 @@
     {{ super() }}
     <div class="container">
         <div class="row">
+            <div class="col-md-12 text-right">
+                <select id="step-menu">
+                    {% for i, text in [(1,"15 min"), (3, "1 hour"), (9, "3 hours"), (29, "9 hours"), (90, "1 day"), (280, "3 days"), (867, "1 week"), (2677, "1 month"), (8267, "3 months"), (25531, "1 year"), (255310, "10 years")] %}
+                        <option {% if step == i %}selected="selected" {% endif %}value="{{ i }}">{{ text }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-md-12">
                 <div id="main"></div>
             </div>
@@ -21,10 +30,25 @@
 {% block script %}
     <script src="{{ url_for('static', filename='js/d3.js') }}"></script>
     <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/metricsgraphics.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/moment-timezone-with-data.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tzscale.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/metricsgraphics.js') }}"></script>
     <script src="{{ url_for('static', filename='js/graph.js') }}"></script>
 
     <script>
         add_graph("{{ name }}", moment("{{ start }}"), moment("{{ stop }}"), {{ step }});
+
+    $("#step-menu").on("change", function() {
+	// The menu is a time interval, but the value for each option is actually a step size. The reason for this is that
+	// the cubism horizon plot plots a single point per pixel so all you need to know is the current time and the step size
+	// and then it just plots one data point per step for each pixel.
+	// Here, we aren't using cubism, but we try to emulate that behavior for consistency, i.e. we find the width in pixels
+	// of the main div and then plot the points from current_time - step*width to current_time in steps of step.
+	var width = $('#main').width();
+	var stop = moment();
+	var start = stop.clone().subtract(this.value*width, 'seconds');
+	window.location.replace($SCRIPT_ROOT + "/graph?name={{ name }}&start=" + start.toISOString() + "&stop=" + stop.toISOString() + "&step=" + this.value);
+    });
+
     </script>
 {% endblock %}
