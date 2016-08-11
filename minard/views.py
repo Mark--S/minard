@@ -16,7 +16,7 @@ from math import isnan
 import os
 import sys
 import random
-import detector_state
+#import detector_state
 import pcadb
 import ecadb
 

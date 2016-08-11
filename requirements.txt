@@ -1,11 +1,11 @@
 flask==0.10
 gunicorn
 #numpy
-#pyzmq
+pyzmq
 redis>=2.10
 #argparse
 #sphinx
 #requests
-#sqlalchemy
+sqlalchemy
 #psycopg2
 #alabaster

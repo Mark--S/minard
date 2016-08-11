@@ -67,11 +67,11 @@
                 </tr>
 
                 <tr>
-                    <td>Expected Laser Frequency </td> <td>{{(runInformation["frequency_expected_subrun"])[subrun_number | int]}}</td>
+                    <td>Expected Laser Pulse Frequency (Hz)</td> <td>{{(runInformation["frequency_expected_subrun"])[subrun_number | int]}}</td>
                 </tr>
 
                 <tr>
-                    <td>Calculated Laser Frequency </td> <td>{{(runInformation["frequency_actual_subrun"])[subrun_number | int]}}</td>
+                    <td>Calculated Laser Pulse Frequency (Hz)</td> <td>{{(runInformation["frequency_actual_subrun"])[subrun_number | int]}}</td>
                 </tr>
                 {% if runInformation["laser_type"][subrun_number | int] != "superK"%}
                 <tr>
