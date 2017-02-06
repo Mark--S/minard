@@ -54,7 +54,7 @@
                 </tr>
                 
                 <tr>
-                    <td>Average NHit for SMELLIE events</td> <td>{{(runInformation["mean_nhit_smellie_trigger_subrun"])[subrun_number | int]}}</td>
+                    <td>Average NHit for SMELLIE events</td> <td>{{roundToInt(runInformation["mean_nhit_smellie_trigger_subrun"][subrun_number | int])}}</td>
                 </tr>
                 
                 
@@ -67,11 +67,11 @@
                 </tr>
 
                 <tr>
-                    <td>Expected Laser Pulse Frequency (Hz)</td> <td>{{(runInformation["frequency_expected_subrun"])[subrun_number | int]}}</td>
+                    <td>Expected Laser Pulse Frequency (Hz)</td> <td>{{runInformation["frequency_expected_subrun"][subrun_number | int]}}</td>
                 </tr>
 
                 <tr>
-                    <td>Calculated Laser Pulse Frequency (Hz)</td> <td>{{(runInformation["frequency_actual_subrun"])[subrun_number | int]}}</td>
+                    <td>Calculated Laser Pulse Frequency (Hz)</td> <td>{{roundToInt(runInformation["frequency_actual_subrun"][subrun_number | int])}}</td>
                 </tr>
                 {% if runInformation["laser_type"][subrun_number | int] != "superK"%}
                 <tr>
@@ -81,7 +81,7 @@
                     <td> Laser Intensity </td> <td>{{runInformation["laser_intensities"][subrun_number | int]}} </td>
                 </tr>
                 <tr>
-                    <td> Laser Intensity Estimate</td> <td>{{runInformation["fixed_laser_intensities_and_superK_wavelengths"][subrun_number | int]}} </td>
+                    <td> Laser Intensity Estimate</td> <td>{{roundToInt(runInformation["fixed_laser_intensities_and_superK_wavelengths"][subrun_number | int])}} </td>
                 </tr>
                 
                 {% else %}
@@ -92,7 +92,7 @@
                     <td> SuperK Laser Wavelength</td> <td>{{runInformation["laser_wavelengths"][subrun_number | int]}} </td>
                 </tr>
                 <tr>
-                    <td> SuperK  Laser Wavelength Estimate</td> <td>{{runInformation["fixed_laser_intensities_and_superK_wavelengths"][subrun_number | int]}} </td>
+                    <td> SuperK  Laser Wavelength Estimate</td> <td>{{roundToInt(runInformation["fixed_laser_intensities_and_superK_wavelengths"][subrun_number | int])}} </td>
                 </tr>
                 {% endif %}
                 </tbody>

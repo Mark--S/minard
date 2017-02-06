@@ -6,9 +6,10 @@ import time
 from redis import Redis
 from os.path import join
 import json
-from tools import total_seconds, parseiso, import_SMELLIEDQ_ratdb, import_TELLIEDQ_ratdb
+import tools
 import requests
 from .tools import parseiso
+from .tools import roundToInt
 from collections import deque, namedtuple
 from .timeseries import get_timeseries, get_interval, get_hash_timeseries
 from .timeseries import get_timeseries_field, get_hash_interval
@@ -49,6 +50,7 @@ TRIGGER_NAMES = \
  'SOFGT',
  'MISS']
 
+app.jinja_env.globals.update(roundToInt=roundToInt)
 
 class Program(object):
     def __init__(self, name, machine=None, link=None, description=None, expire=10, display_log=True):
@@ -610,70 +612,58 @@ def pca_run_detail(run_number):
     
     return render_template('pca_run_detail.html',
                             run_number=run_number)      
+
+@app.route('/hldq')
+def hldq():
+    #Load the run numbers
+    return 
+
 @app.route('/calibdq')
 def calibdq():
         return render_template('calibdq.html')
    
 @app.route('/calibdq_tellie')
 def calibdq_tellie():
-    run_numbers = []
-    run_info = []
-    root_dir = "/home/mark/Documents/PHD/DQTests/TELLIEDQTest/"
-    ratOutputs = os.listdir(root_dir)
-    for files in ratOutputs:
-        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and "p2" in files and ".sw" not in files:
-            run_num, check_params, runInformation =  import_TELLIEDQ_ratdb(os.path.join(root_dir,files))
-            if "dqtellieproc" in check_params:
-                run_numbers.append(run_num)
-                run_info.append(check_params["dqtellieproc"])
-    print(run_numbers)
-    print(run_info)
-    return render_template('calibdq_tellie.html',run_numbers=run_numbers,run_info=run_info)
+    run_dict = {}
+    run_numbers = tools.import_TELLIE_runnumbers()
+    for num in run_numbers:
+            run_num, check_params, runInformation =  tools.import_TELLIEDQ_ratdb(num)
+            #If we cant find DQ info skip
+            if check_params == -1 or runInformation == -1:
+                continue
+            run_dict[num] = check_params
+
+    return render_template('calibdq_tellie.html',run_numbers=run_dict.keys(),run_info=run_dict.values())
 
 @app.route('/calibdq_tellie/<run_number>/')
 def calibdq_tellie_run_number(run_number):
-    run_num = 0
-    plots = []
-    runInformation = {}
-    subRunChecks = 0
-    root_tellie_dir = "/home/mark/Documents/PHD/DQTests/TELLIEDQTest/"
-    ratOutputs = os.listdir(root_tellie_dir)
-    for files in ratOutputs:
-        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and "p2" and run_number in files and ".sw" not in files:
-            run_num, check_params, runInformation =  import_TELLIEDQ_ratdb(os.path.join(root_tellie_dir,files))
-    
-    return render_template('calibdq_tellie_run.html',run_number=run_number, runInformation=runInformation)
+    run_num, check_params, runInfo=  tools.import_TELLIEDQ_ratdb(int(run_number))
+    return render_template('calibdq_tellie_run.html',run_number=run_number, runInformation=runInfo)
 
 
 @app.route('/calibdq_tellie/<run_number>/<subrun_number>')
 def calibdq_tellie_subrun_number(run_number,subrun_number):
     run_num = 0
     plots = []
-    runInformation = {}
-    subRunChecks = 0
     subrun_index = -999
     root_dir = os.path.join(app.static_folder,"images/DQ/TELLIEDQPlots_"+str(run_number))
-    root_tellie_dir = "/home/mark/Documents/PHD/DQTests/TELLIEDQTest/"
-    ratOutputs = os.listdir(root_tellie_dir)
-    for files in ratOutputs:
-        if "DATAQUALITY_RECORDS" in files and ".ratdb" in files and "p2" and run_number in files and ".sw" not in files:
-            print(files)
-            run_num, check_params, runInformation =  import_TELLIEDQ_ratdb(os.path.join(root_tellie_dir,files))
-    
-    for i in range(len(runInformation["subrun_numbers"])):
-        if int(runInformation["subrun_numbers"][i]) == int(subrun_number):
+    run_num, check_params, runInfo=  tools.import_TELLIEDQ_ratdb(int(run_number))
+    #Find the index
+    for i in range(len(runInfo["subrun_numbers"])):
+        if int(runInfo["subrun_numbers"][i]) == int(subrun_number):
             subrun_index = i
-            break
-    images = os.listdir(root_dir)
     #Array to store the titles of the plots
     titleArray = ["Hit Map","NHits Per Event","TAC Plot","Calibrated Hit Time Plot"]
-    print("Subrun Index: "+str(subrun_index)) 
-    print(runInformation)
+    images = []
+    try:
+        images = os.listdir(root_dir)
+    except OSError:
+        print("Unable to find images directory")
     for image in images:
         if "subrun_"+str(subrun_number) in image:
             img_url = url_for("static",filename=os.path.join("images/DQ/TELLIEDQPlots_"+str(run_number),image))
             plots.append(img_url)
-    return render_template('calibdq_tellie_subrun.html',run_number=run_number,subrun_index=subrun_index,plots=plots, titles=titleArray, runInformation=runInformation)
+    return render_template('calibdq_tellie_subrun.html',run_number=run_number,subrun_index=subrun_index,plots=plots, titles=titleArray, runInformation=runInfo)
 
 
 @app.route('/calibdq_smellie')
